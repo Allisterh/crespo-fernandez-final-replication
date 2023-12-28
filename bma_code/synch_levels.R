@@ -2,17 +2,105 @@
 # Clean working space and load necessary libraries #
 
 rm(list=ls())
-library(readxl)
-library(dplyr)
-library(tidyr)
-library(BMS)
-library(Cairo)
-library(reshape2)
-library(ggplot2)
-library(writexl)
-library(xtable)
-library(stargazer)
 
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(readxl, dplyr, tidyr, BMS, Cairo, reshape2, ggplot2, writexl, 
+               xtable, stargazer, stringr)
+
+# Load the necessary functions 
+
+func.files <- list.files(path = "../funcs", pattern = "\\.R$", full.names = TRUE)
+
+for (file in func.files) {
+  
+  source(file)
+  
+}
+
+
+# Produce state-dependent synchronization tests (Table A.3)
+
+
+synch.data = read_excel("../bma_data/synch_levels.xlsx") %>% 
+  select(date, country, synch, rec, zlb) %>% 
+  mutate(draghi = ifelse(date >= '2012-07-01', 1, 0))
+
+# Get unique country list 
+
+country.list = sort(unique(synch.data$country))
+
+# Create three arrays for the results (recession, ZLB, Draghi)
+
+rec.results = as.data.frame(cbind(country.list, 
+                                  array(0, c(length(country.list),1))), row.names = F) %>% 
+  rename(Country = country.list, Pval = V2)
+
+# Note: for ZLB and Draghi is country.list-2 because Latvia and Lithuania was always either in ZLB or always in Draghi!
+
+lv.lt.country.list = country.list[! country.list %in% c('latvia', 'lithuania')]
+
+zlb.results = as.data.frame(cbind(lv.lt.country.list, 
+                                  array(0, c(length(lv.lt.country.list),1))), row.names = F) %>% 
+  rename(Country = lv.lt.country.list, Pval = V2)
+
+draghi.results = as.data.frame(cbind(lv.lt.country.list, 
+                                     array(0, c(length(lv.lt.country.list),1))), row.names = F) %>% 
+  rename(Country = lv.lt.country.list, Pval = V2)
+
+
+# T-test for recession variable
+
+for (jj in 1:length(country.list)) {
+  
+  rec.results[jj,2] = round(my.ttest(country.list[jj], rec)$p.value,5)
+  
+  
+}
+
+rec.results = rec.results %>% 
+  mutate(Pval = as.numeric(Pval), 
+         Significant = ifelse(Pval < 0.05, "Yes", "No"), 
+         Country = str_to_title(Country))
+
+
+# T-test for ZLB variable 
+
+for (jj in 1:length(lv.lt.country.list)) {
+  
+  zlb.results[jj,2] = round(my.ttest(lv.lt.country.list[jj], zlb)$p.value,5)
+  
+  
+}
+
+zlb.results = zlb.results %>% 
+  mutate(Pval = as.numeric(Pval), 
+         Significant = ifelse(Pval < 0.05, "Yes", "No"), 
+         Country = str_to_title(Country))
+
+
+# T-test for Draghi variable 
+
+for (jj in 1:length(lv.lt.country.list)) {
+  
+  draghi.results[jj,2] = round(my.ttest(lv.lt.country.list[jj], draghi)$p.value,5)
+  
+  
+}
+
+draghi.results = draghi.results %>% 
+  mutate(Pval = as.numeric(Pval), 
+         Significant = ifelse(Pval < 0.05, "Yes", "No"), 
+         Country = str_to_title(Country))
+
+# Print the tables 
+
+print(rec.results, row.names = F) 
+print(zlb.results, row.names = F) 
+print(draghi.results, row.names = F) 
+
+# Start here BMS models 
+
+rm(list=ls())
 # Set seed and number of iterations + burnin phase
 
 set.seed(14091998)
@@ -105,7 +193,6 @@ my_func = function(my_country) {
 # Example below for Austria
 
 my_func("austria")
-
 
 
 # Add Draghi dummy + interactions
