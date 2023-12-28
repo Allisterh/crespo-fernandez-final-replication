@@ -3,15 +3,21 @@
 
 # Clean working space and load necessary libraries #
 
-rm(list=ls())
-library(readxl)
-library(dplyr)
-library(tidyr)
-library(BMS)
-library(Cairo)
-library(reshape2)
-library(ggplot2)
-library(writexl)
+rm(list = ls())
+
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(DescTools, tidyr, dplyr, readxl, ggplot2, lubridate, zoo, stringr,
+               xtable, stargazer, stats, Hmisc, plm)
+
+# Load the necessary functions 
+
+func.files <- list.files(path = "funcs", pattern = "\\.R$", full.names = TRUE)
+
+for (file in func.files) {
+  
+  source(file)
+  
+}
 
 # Set seed and number of iterations + burnin phase
 
