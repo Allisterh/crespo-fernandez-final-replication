@@ -109,7 +109,6 @@ n.iter = 1e7
 
 # Read the dataset, set WD and read jointness function #
 
-source("jointness_function.R")
 data_path = "../bma_data"
 
 fulldata = read_excel(file.path(data_path, "synch_levels.xlsx"))

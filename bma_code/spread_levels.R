@@ -15,7 +15,6 @@ n.iter = 1e+07
 
 # Read the dataset, set WD and read jointness function #
 
-source("jointness_function.R")
 data_path = "../bma_data"
 
 fulldata = read_excel(file.path(data_path, "spread_levels.xlsx"))
