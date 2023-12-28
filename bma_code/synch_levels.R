@@ -643,4 +643,8 @@ coefs_heredity <- coef(model_heredity,  std.coefs = T, order.by.pip = F)
 
 coefs_heredity = coefs_heredity[!row.names(coefs_heredity) %in% year_dummy_names,1:3]
 
+# Reproduce all columns of Table 1 in the paper 
 
+coefs_fe
+coefs_nofe
+coefs_heredity

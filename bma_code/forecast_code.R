@@ -199,13 +199,13 @@ ar_forecast_data.piigs = ar_forecast_data %>%
 ar_forecast_data.nopiigs = ar_forecast_data %>% 
   filter(!country %in% piigs_subset)
 
-# Print the forecast results for all the sample 
+# Print the forecast results for all the sample (part of Table 3 in the paper)
 
 cat(dir.results(ar_forecast_data), "\n")
 cat(dir.results(ar_forecast_data.piigs), "\n")
 cat(dir.results(ar_forecast_data.nopiigs), "\n")
 
-# Print the forecast results without 2020
+# Print the forecast results without 2020 (part of Table A.5 in the paper)
 
 cat(dir.results(without.2020(ar_forecast_data)), "\n")
 cat(dir.results(without.2020(ar_forecast_data.piigs)), "\n")
@@ -297,13 +297,13 @@ ar.country.data.piigs = ar.country.data %>%
 ar.country.data.nopiigs = ar.country.data %>% 
   filter(!country %in% piigs_subset)
 
-# Print the forecast results for all the sample 
+# Print the forecast results for all the sample (part of Table 3 in the paper)
 
 cat(dir.results(ar.country.data), "\n")
 cat(dir.results(ar.country.data.piigs), "\n")
 cat(dir.results(ar.country.data.nopiigs), "\n")
 
-# Print the forecast results without 2020
+# Print the forecast results without 2020 (part of Table A.5 in the paper)
 
 cat(dir.results(without.2020(ar.country.data)), "\n")
 cat(dir.results(without.2020(ar.country.data.piigs)), "\n")
@@ -742,13 +742,13 @@ bma.synch.levels.forecast.data.piigs = bma.synch.levels.forecast.data %>%
 bma.synch.levels.forecast.data.nopiigs = bma.synch.levels.forecast.data %>% 
   filter(!country %in% piigs_subset)
 
-# Print the forecast results for all the sample 
+# Print the forecast results for all the sample (part of Table 3 in the paper)
 
 cat(dir.results(bma.synch.levels.forecast.data), "\n")
 cat(dir.results(bma.synch.levels.forecast.data.piigs), "\n")
 cat(dir.results(bma.synch.levels.forecast.data.nopiigs), "\n")
 
-# Print the forecast results without 2020
+# Print the forecast results without 2020 (part of Table A.5 in the paper)
 
 cat(dir.results(without.2020(bma.synch.levels.forecast.data)), "\n")
 cat(dir.results(without.2020(bma.synch.levels.forecast.data.piigs)), "\n")
@@ -861,13 +861,13 @@ bma.synch.synch.forecast.data.piigs = bma.synch.synch.forecast.data %>%
 bma.synch.synch.forecast.data.nopiigs = bma.synch.synch.forecast.data %>% 
   filter(!country %in% piigs_subset)
 
-# Print the forecast results for all the sample 
+# Print the forecast results for all the sample (part of Table 3 in the paper)
 
 cat(dir.results(bma.synch.synch.forecast.data), "\n")
 cat(dir.results(bma.synch.synch.forecast.data.piigs), "\n")
 cat(dir.results(bma.synch.synch.forecast.data.nopiigs), "\n")
 
-# Print the forecast results without 2020
+# Print the forecast results without 2020 (part of Table A.5 in the paper)
 
 cat(dir.results(without.2020(bma.synch.synch.forecast.data)), "\n")
 cat(dir.results(without.2020(bma.synch.synch.forecast.data.piigs)), "\n")

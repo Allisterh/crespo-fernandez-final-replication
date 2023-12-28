@@ -266,13 +266,13 @@ synch_levels_pip_forecast_data.piigs = synch_levels_pip_forecast_data %>%
 synch_levels_pip_forecast_data.nopiigs = synch_levels_pip_forecast_data %>% 
   filter(!country %in% piigs_subset)
 
-# Print the forecast results for all the sample 
+# Print the forecast results for all the sample (part of Table 3 in the paper)
 
 cat(dir.results(synch_levels_pip_forecast_data), "\n")
 cat(dir.results(synch_levels_pip_forecast_data.piigs), "\n")
 cat(dir.results(synch_levels_pip_forecast_data.nopiigs), "\n")
 
-# Print the forecast results without 2020
+# Print the forecast results without 2020 (part of Table A.5 in the paper)
 
 cat(dir.results(without.2020(synch_levels_pip_forecast_data)), "\n")
 cat(dir.results(without.2020(synch_levels_pip_forecast_data.piigs)), "\n")

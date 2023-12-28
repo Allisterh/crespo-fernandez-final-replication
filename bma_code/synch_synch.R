@@ -7,6 +7,15 @@ if (!require("pacman")) install.packages("pacman")
 pacman::p_load(readxl, dplyr, tidyr, BMS, Cairo, reshape2,
                ggplot2, writexl, xtable, stargazer)
 
+# Load the necessary functions 
+
+func.files <- list.files(path = "../funcs", pattern = "\\.R$", full.names = TRUE)
+
+for (file in func.files) {
+  
+  source(file)
+  
+}
 
 # Set seed and number of iterations + burnin phase
 
@@ -232,10 +241,11 @@ max.jointness.yqm = max.jointness.yqm %>%
 
 # Plot the matrices #
 # Recall: we do not show the year fixed effects #
+
 width = 1600
 height = 900
 
-
+# Reproduce Figure A.5 in the paper
 
 jointness.dw2 %>% 
   filter(!grepl("d_", Var1)) %>% 
@@ -250,6 +260,8 @@ jointness.dw2 %>%
   guides(fill = guide_colourbar(barwidth = 0.5,
                                 barheight = 20))
 
+# Reproduce Figure A.6 in the paper
+
 jointness.ls2 %>% 
   filter(!grepl("d_", Var1)) %>% 
   filter(!grepl("d_", Var2)) %>% 
@@ -262,6 +274,8 @@ jointness.ls2 %>%
   theme(legend.text = element_text(size=7), legend.title = element_blank()) + 
   guides(fill = guide_colourbar(barwidth = 0.5,
                                 barheight = 20))
+
+# Reproduce Figure A.2 in the paper
 
 jointness.yqm %>% 
   filter(!grepl("d_", Var1)) %>% 
@@ -462,3 +476,8 @@ coefs_heredity <- coef(model_heredity,  std.coefs = T, order.by.pip = F)
 coefs_heredity = coefs_heredity[!row.names(coefs_heredity) %in% year_dummy_names,1:3]
 
 
+# Reproduce all columns of Table 2 in the paper 
+
+coefs_fe
+coefs_nofe
+coefs_heredity
