@@ -99,7 +99,7 @@ print(draghi.results, row.names = F)
 
 # Start here BMS models 
 
-rm(list=ls())
+rm(list = setdiff(ls(), lsf.str()))
 
 # Set seed and number of iterations + burnin phase
 
@@ -167,7 +167,7 @@ fulldata %>%
   summarise(`Start Date` = as.Date(min(date)), `End Date` = as.Date(max(date))) 
 
 
-# Summary statistics by country (Table A.2, select specific country to display)
+# Summary statistics by country (Table A.2 in the paper, select specific country to display)
 
 my_func = function(my_country) {  
   
