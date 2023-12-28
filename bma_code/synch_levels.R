@@ -406,10 +406,27 @@ max.jointness.yqm = max.jointness.yqm %>%
 
 # Plot the matrices #
 # Recall: we do not show the year fixed effects #
+
 width = 1600
 height = 900
 
 
+# Reproduce Figure A.1 in the paper
+
+jointness.yqm %>% 
+  filter(!grepl("d_", Var1)) %>% 
+  filter(!grepl("d_", Var2)) %>% 
+  ggplot(aes(Var1, Var2, fill= value)) + 
+  geom_tile() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  labs(x = "", y = "") + 
+  theme(axis.text=element_text(size=6)) +  
+  scale_fill_continuous( low = "black", high = "red") +
+  theme(legend.text = element_text(size=7), legend.title = element_blank()) + 
+  guides(fill = guide_colourbar(barwidth = 0.5,
+                                barheight = 20))
+
+# Reproduce Figure A.3 in the paper
 
 jointness.dw2 %>% 
   filter(!grepl("d_", Var1)) %>% 
@@ -424,6 +441,8 @@ jointness.dw2 %>%
   guides(fill = guide_colourbar(barwidth = 0.5,
                                 barheight = 20))
 
+# Reproduce Figure A.4 in the paper
+
 jointness.ls2 %>% 
   filter(!grepl("d_", Var1)) %>% 
   filter(!grepl("d_", Var2)) %>% 
@@ -437,18 +456,7 @@ jointness.ls2 %>%
   guides(fill = guide_colourbar(barwidth = 0.5,
                                 barheight = 20))
 
-jointness.yqm %>% 
-  filter(!grepl("d_", Var1)) %>% 
-  filter(!grepl("d_", Var2)) %>% 
-  ggplot(aes(Var1, Var2, fill= value)) + 
-  geom_tile() + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
-  labs(x = "", y = "") + 
-  theme(axis.text=element_text(size=6)) +  
-  scale_fill_continuous( low = "black", high = "red") +
-  theme(legend.text = element_text(size=7), legend.title = element_blank()) + 
-  guides(fill = guide_colourbar(barwidth = 0.5,
-                                barheight = 20))
+
 
 # Model without Fixed Effects: add only time (year) fixed effects  #
 
