@@ -3,16 +3,21 @@
 
 # Clean working space and load necessary libraries #
 
-rm(list=ls())
-library(readxl)
-library(dplyr)
-library(tidyr)
-library(BMS)
-library(Cairo)
-library(reshape2)
-library(ggplot2)
-library(writexl)
-library(lubridate)
+rm(list = ls())
+
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(DescTools, tidyr, dplyr, readxl, ggplot2, lubridate, zoo, stringr,
+               xtable, stargazer, stats, Hmisc, plm, BMS)
+
+# Load the necessary functions 
+
+func.files <- list.files(path = "../funcs", pattern = "\\.R$", full.names = TRUE)
+
+for (file in func.files) {
+  
+  source(file)
+  
+}
 
 # Set seed and number of iterations + burnin phase
 
@@ -261,80 +266,14 @@ synch_levels_pip_forecast_data.piigs = synch_levels_pip_forecast_data %>%
 synch_levels_pip_forecast_data.nopiigs = synch_levels_pip_forecast_data %>% 
   filter(!country %in% piigs_subset)
 
-# Compute the RMSE 
+# Print the forecast results for all the sample 
 
-rmse.synch.levels.pip50 = synch_levels_pip_forecast_data %>% 
-  ungroup() %>% 
-  filter(!is.na(res_sq)) %>% 
-  summarise(rmse = sqrt(sum(res_sq) / nrow(synch_levels_pip_forecast_data%>% 
-                                             filter(!is.na(res_sq)))))
+cat(dir.results(synch_levels_pip_forecast_data), "\n")
+cat(dir.results(synch_levels_pip_forecast_data.piigs), "\n")
+cat(dir.results(synch_levels_pip_forecast_data.nopiigs), "\n")
 
-# Do the same for PIIGS countries #
+# Print the forecast results without 2020
 
-rmse.synch.levels.pip50.piigs = synch_levels_pip_forecast_data.piigs %>% 
-  ungroup() %>% 
-  filter(!is.na(res_sq)) %>% 
-  summarise(rmse = sqrt(sum(res_sq) / nrow(synch_levels_pip_forecast_data.piigs%>% 
-                                             filter(!is.na(res_sq)))))
-
-# Do the same for non-PIIGS countries
-
-
-rmse.synch.levels.pip50.nopiigs = synch_levels_pip_forecast_data.nopiigs %>% 
-  ungroup() %>% 
-  filter(!is.na(res_sq)) %>% 
-  summarise(rmse = sqrt(sum(res_sq) / nrow(synch_levels_pip_forecast_data.nopiigs%>% 
-                                             filter(!is.na(res_sq)))))
-
-# Compute the Directional Accuracy measure 
-
-table.synch.levels.pip50 = table(synch_levels_pip_forecast_data$f_synch_direction, synch_levels_pip_forecast_data$synch_direction)
-
-da.synch.levels.pip50 = round(sum(diag(table.synch.levels.pip50)) / sum(table.synch.levels.pip50), 4)
-
-hr.synch.levels.pip50 = table.synch.levels.pip50[4]/(table.synch.levels.pip50[4]+table.synch.levels.pip50[3])
-
-fa.synch.levels.pip50 = table.synch.levels.pip50[2]/(table.synch.levels.pip50[2]+table.synch.levels.pip50[1])
-
-ks.synch.levels.pip50 =  hr.synch.levels.pip50 - fa.synch.levels.pip50
-
-
-# Do the same for PIIGS countries #
-
-table.synch.levels.pip50.piigs = table(synch_levels_pip_forecast_data.piigs$f_synch_direction, synch_levels_pip_forecast_data.piigs$synch_direction)
-
-da.synch.levels.pip50.piigs = round(sum(diag(table.synch.levels.pip50.piigs)) / sum(table.synch.levels.pip50.piigs), 4)
-
-hr.synch.levels.pip50.piigs = table.synch.levels.pip50.piigs[4]/(table.synch.levels.pip50.piigs[4]+table.synch.levels.pip50.piigs[3])
-
-fa.synch.levels.pip50.piigs = table.synch.levels.pip50.piigs[2]/(table.synch.levels.pip50.piigs[2]+table.synch.levels.pip50.piigs[1])
-
-ks.synch.levels.pip50.piigs =  hr.synch.levels.pip50.piigs - fa.synch.levels.pip50.piigs
-
-# Do the same for non-PIIGS countries #
-
-table.synch.levels.pip50.nopiigs = table(synch_levels_pip_forecast_data.nopiigs$f_synch_direction, synch_levels_pip_forecast_data.nopiigs$synch_direction)
-
-da.synch.levels.pip50.nopiigs = round(sum(diag(table.synch.levels.pip50.nopiigs)) / sum(table.synch.levels.pip50.nopiigs), 4)
-
-hr.synch.levels.pip50.nopiigs = table.synch.levels.pip50.nopiigs[4]/(table.synch.levels.pip50.nopiigs[4]+table.synch.levels.pip50.nopiigs[3])
-
-fa.synch.levels.pip50.nopiigs = table.synch.levels.pip50.nopiigs[2]/(table.synch.levels.pip50.nopiigs[2]+table.synch.levels.pip50.nopiigs[1])
-
-ks.synch.levels.pip50.nopiigs =  hr.synch.levels.pip50.nopiigs - fa.synch.levels.pip50.nopiigs
-
-
-# Create the remaining rows for the final table
-
-# All countries #
-
-round(c(rmse.synch.levels.pip50$rmse, da.synch.levels.pip50, hr.synch.levels.pip50, fa.synch.levels.pip50,ks.synch.levels.pip50),4)
-
-# PIIGS #
-
-round(c(rmse.synch.levels.pip50.piigs$rmse, da.synch.levels.pip50.piigs, hr.synch.levels.pip50.piigs, fa.synch.levels.pip50.piigs,ks.synch.levels.pip50.piigs),4)
-
-
-# Non-PIIGS #
-
-round(c(rmse.synch.levels.pip50.nopiigs$rmse, da.synch.levels.pip50.nopiigs, hr.synch.levels.pip50.nopiigs, fa.synch.levels.pip50.nopiigs,ks.synch.levels.pip50.nopiigs),4)
+cat(dir.results(without.2020(synch_levels_pip_forecast_data)), "\n")
+cat(dir.results(without.2020(synch_levels_pip_forecast_data.piigs)), "\n")
+cat(dir.results(without.2020(synch_levels_pip_forecast_data.nopiigs)), "\n")

@@ -3,16 +3,21 @@
 
 # Clean working space and load necessary libraries #
 
-rm(list=ls())
-library(readxl)
-library(dplyr)
-library(tidyr)
-library(BMS)
-library(Cairo)
-library(reshape2)
-library(ggplot2)
-library(writexl)
-library(lubridate)
+rm(list = ls())
+
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(DescTools, tidyr, dplyr, readxl, ggplot2, lubridate, zoo, stringr,
+               xtable, stargazer, stats, Hmisc, plm, BMS)
+
+# Load the necessary functions 
+
+func.files <- list.files(path = "../funcs", pattern = "\\.R$", full.names = TRUE)
+
+for (file in func.files) {
+  
+  source(file)
+  
+}
 
 # Set seed and number of iterations + burnin phase
 
@@ -290,85 +295,14 @@ synch_synch_pip_forecast_data.nopiigs = synch_synch_pip_forecast_data %>%
   filter(!country %in% piigs_subset)
 
 
+# Print the forecast results for all the sample 
 
-# Compute the RMSE 
+cat(dir.results(synch_synch_pip_forecast_data), "\n")
+cat(dir.results(synch_synch_pip_forecast_data.piigs), "\n")
+cat(dir.results(synch_synch_pip_forecast_data.nopiigs), "\n")
 
-rmse.synch.synch.pip50 = synch_synch_pip_forecast_data %>% 
-  ungroup() %>% 
-  filter(!is.na(res_sq)) %>% 
-  summarise(rmse = sqrt(sum(res_sq) / nrow(synch_synch_pip_forecast_data%>% 
-                                             filter(!is.na(res_sq)))))
+# Print the forecast results without 2020
 
-# Do the same for PIIGS countries #
-
-rmse.synch.synch.pip50.piigs = synch_synch_pip_forecast_data.piigs %>% 
-  ungroup() %>% 
-  filter(!is.na(res_sq)) %>% 
-  summarise(rmse = sqrt(sum(res_sq) / nrow(synch_synch_pip_forecast_data.piigs%>% 
-                                             filter(!is.na(res_sq)))))
-
-# Do the same for non-PIIGS countries
-
-
-rmse.synch.synch.pip50.nopiigs = synch_synch_pip_forecast_data.nopiigs %>% 
-  ungroup() %>% 
-  filter(!is.na(res_sq)) %>% 
-  summarise(rmse = sqrt(sum(res_sq) / nrow(synch_synch_pip_forecast_data.nopiigs%>% 
-                                             filter(!is.na(res_sq)))))
-
-
-# Compute the Directional Accuracy measure 
-
-table.synch.synch.pip50 = table(synch_synch_pip_forecast_data$f_synch_direction, synch_synch_pip_forecast_data$synch_direction)
-
-da.synch.synch.pip50 = round(sum(diag(table.synch.synch.pip50)) / sum(table.synch.synch.pip50), 4)
-
-hr.synch.synch.pip50 = table.synch.synch.pip50[4]/(table.synch.synch.pip50[4]+table.synch.synch.pip50[3])
-
-fa.synch.synch.pip50 = table.synch.synch.pip50[2]/(table.synch.synch.pip50[2]+table.synch.synch.pip50[1])
-
-ks.synch.synch.pip50 =  hr.synch.synch.pip50 - fa.synch.synch.pip50
-
-
-
-# Do the same for PIIGS countries #
-
-table.synch.synch.pip50.piigs = table(synch_synch_pip_forecast_data.piigs$f_synch_direction, synch_synch_pip_forecast_data.piigs$synch_direction)
-
-da.synch.synch.pip50.piigs = round(sum(diag(table.synch.synch.pip50.piigs)) / sum(table.synch.synch.pip50.piigs), 4)
-
-hr.synch.synch.pip50.piigs = table.synch.synch.pip50.piigs[4]/(table.synch.synch.pip50.piigs[4]+table.synch.synch.pip50.piigs[3])
-
-fa.synch.synch.pip50.piigs = table.synch.synch.pip50.piigs[2]/(table.synch.synch.pip50.piigs[2]+table.synch.synch.pip50.piigs[1])
-
-ks.synch.synch.pip50.piigs =  hr.synch.synch.pip50.piigs - fa.synch.synch.pip50.piigs
-
-# Do the same for non-PIIGS countries #
-
-table.synch.synch.pip50.nopiigs = table(synch_synch_pip_forecast_data.nopiigs$f_synch_direction, synch_synch_pip_forecast_data.nopiigs$synch_direction)
-
-da.synch.synch.pip50.nopiigs = round(sum(diag(table.synch.synch.pip50.nopiigs)) / sum(table.synch.synch.pip50.nopiigs), 4)
-
-hr.synch.synch.pip50.nopiigs = table.synch.synch.pip50.nopiigs[4]/(table.synch.synch.pip50.nopiigs[4]+table.synch.synch.pip50.nopiigs[3])
-
-fa.synch.synch.pip50.nopiigs = table.synch.synch.pip50.nopiigs[2]/(table.synch.synch.pip50.nopiigs[2]+table.synch.synch.pip50.nopiigs[1])
-
-ks.synch.synch.pip50.nopiigs =  hr.synch.synch.pip50.nopiigs - fa.synch.synch.pip50.nopiigs
-
-
-
-# Create the remaining rows for the final table
-
-# All countries #
-
-round(c(rmse.synch.synch.pip50$rmse, da.synch.synch.pip50, hr.synch.synch.pip50, fa.synch.synch.pip50,ks.synch.synch.pip50),4)
-
-# PIIGS #
-
-round(c(rmse.synch.synch.pip50.piigs$rmse, da.synch.synch.pip50.piigs, hr.synch.synch.pip50.piigs, fa.synch.synch.pip50.piigs,ks.synch.synch.pip50.piigs),4)
-
-
-# Non-PIIGS #
-
-round(c(rmse.synch.synch.pip50.nopiigs$rmse, da.synch.synch.pip50.nopiigs, hr.synch.synch.pip50.nopiigs, fa.synch.synch.pip50.nopiigs,ks.synch.synch.pip50.nopiigs),4)
-
+cat(dir.results(without.2020(synch_synch_pip_forecast_data)), "\n")
+cat(dir.results(without.2020(synch_synch_pip_forecast_data.piigs)), "\n")
+cat(dir.results(without.2020(synch_synch_pip_forecast_data.nopiigs)), "\n")
