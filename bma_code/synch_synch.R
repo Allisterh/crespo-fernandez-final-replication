@@ -2,16 +2,11 @@
 # Clean working space and load necessary libraries #
 
 rm(list=ls())
-library(readxl)
-library(dplyr)
-library(tidyr)
-library(BMS)
-library(Cairo)
-library(reshape2)
-library(ggplot2)
-library(writexl)
-library(xtable)
-library(stargazer)
+
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(readxl, dplyr, tidyr, BMS, Cairo, reshape2,
+               ggplot2, writexl, xtable, stargazer)
+
 
 # Set seed and number of iterations + burnin phase
 
