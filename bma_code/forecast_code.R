@@ -199,11 +199,17 @@ ar_forecast_data.piigs = ar_forecast_data %>%
 ar_forecast_data.nopiigs = ar_forecast_data %>% 
   filter(!country %in% piigs_subset)
 
-# Print the forecast results
+# Print the forecast results for all the sample 
 
 cat(dir.results(ar_forecast_data), "\n")
 cat(dir.results(ar_forecast_data.piigs), "\n")
 cat(dir.results(ar_forecast_data.nopiigs), "\n")
+
+# Print the forecast results without 2020
+
+cat(dir.results(without_2020(ar_forecast_data)), "\n")
+cat(dir.results(without_2020(ar_forecast_data.piigs)), "\n")
+cat(dir.results(without_2020(ar_forecast_data.nopiigs)), "\n")
 
 ####################################################################################################
 #                                           AR (country-specific) MODELS                           #
