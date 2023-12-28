@@ -18,8 +18,7 @@ for (file in func.files) {
 }
 
 
-# Produce state-dependent synchronization tests (Table A.3)
-
+# Produce state-dependent synchronization tests (Table A.3 in the paper)
 
 synch.data = read_excel("../bma_data/synch_levels.xlsx") %>% 
   select(date, country, synch, rec, zlb) %>% 
@@ -92,7 +91,7 @@ draghi.results = draghi.results %>%
          Significant = ifelse(Pval < 0.05, "Yes", "No"), 
          Country = str_to_title(Country))
 
-# Print the tables 
+# Print the tables (Table A.3 in the paper)
 
 print(rec.results, row.names = F) 
 print(zlb.results, row.names = F) 
@@ -101,6 +100,7 @@ print(draghi.results, row.names = F)
 # Start here BMS models 
 
 rm(list=ls())
+
 # Set seed and number of iterations + burnin phase
 
 set.seed(14091998)
@@ -114,7 +114,7 @@ data_path = "../bma_data"
 fulldata = read_excel(file.path(data_path, "synch_levels.xlsx"))
 
 
-# Reproduce synchronization figure in the paper (Figure 3)
+# Reproduce synchronization figure in the paper (Figure 3 in the paper)
 
 fulldata %>% 
   mutate(country = case_when(
@@ -142,7 +142,7 @@ fulldata %>%
   labs(x = "Date", y = "Long-term yield synchronization rates")
 
 
-# Data availability by country (Table A.1)
+# Data availability by country (Table A.1 in the paper)
 
 fulldata %>% 
   select(country, date) %>% 
