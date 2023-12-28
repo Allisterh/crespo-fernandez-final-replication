@@ -11,7 +11,7 @@ pacman::p_load(DescTools, tidyr, dplyr, readxl, ggplot2, lubridate, zoo, stringr
 
 # Load the necessary functions 
 
-func.files <- list.files(path = "funcs", pattern = "\\.R$", full.names = TRUE)
+func.files <- list.files(path = "../funcs", pattern = "\\.R$", full.names = TRUE)
 
 for (file in func.files) {
   
@@ -191,15 +191,6 @@ ar_forecast_data = ar_forecast_data %>%
 ar_forecast_data = ar_forecast_data %>% 
   mutate(res_sq = (synch-f_synch)^2)
 
-# Compute the RMSE 
-
-rmse.pooled = ar_forecast_data %>% 
-  ungroup() %>% 
-  filter(!is.na(res_sq)) %>% 
-  summarise(rmse = sqrt(sum(res_sq) / nrow(ar_forecast_data%>% 
-                                             filter(!is.na(res_sq)))))
-round(rmse.pooled,4)
-
 # Create forecasting dataset for PIIGS and non-PIIGS countries
 
 ar_forecast_data.piigs = ar_forecast_data %>% 
@@ -208,58 +199,11 @@ ar_forecast_data.piigs = ar_forecast_data %>%
 ar_forecast_data.nopiigs = ar_forecast_data %>% 
   filter(!country %in% piigs_subset)
 
-# Do the same for PIIGS and non-PIIGS countries
+# Print the forecast results
 
-rmse.pooled.piigs = ar_forecast_data.piigs %>% 
-  ungroup() %>% 
-  filter(!is.na(res_sq)) %>% 
-  summarise(rmse = sqrt(sum(res_sq) / nrow(ar_forecast_data.piigs%>% 
-                                             filter(!is.na(res_sq)))))
-
-rmse.pooled.nopiigs = ar_forecast_data.nopiigs %>% 
-  ungroup() %>% 
-  filter(!is.na(res_sq)) %>% 
-  summarise(rmse = sqrt(sum(res_sq) / nrow(ar_forecast_data.nopiigs%>% 
-                                             filter(!is.na(res_sq)))))
-
-# Compute the Directional Accuracy measure 
-
-table.pooled = table(ar_forecast_data$f_synch_direction, ar_forecast_data$synch_direction)
-
-da.pooled = round(sum(diag(table.pooled)) / sum(table.pooled), 4)
-
-hr.pooled = table.pooled[4]/(table.pooled[4]+table.pooled[3])
-
-fa.pooled = table.pooled[2]/(table.pooled[2]+table.pooled[1])
-  
-ks.pooled =  hr.pooled - fa.pooled
-
-
-# Create the contigency tables and indicators # 
-
-# For PIIGS # 
-
-table.pooled.piigs = table(ar_forecast_data.piigs$f_synch_direction, ar_forecast_data.piigs$synch_direction)
-
-da.pooled.piigs = round(sum(diag(table.pooled.piigs)) / sum(table.pooled.piigs), 4)
-
-hr.pooled.piigs = table.pooled.piigs[4]/(table.pooled.piigs[4]+table.pooled.piigs[3])
-
-fa.pooled.piigs = table.pooled.piigs[2]/(table.pooled.piigs[2]+table.pooled.piigs[1])
-
-ks.pooled.piigs =  hr.pooled.piigs - fa.pooled.piigs
-
-# For non-PIIGS #
-
-table.pooled.nopiigs = table(ar_forecast_data.nopiigs$f_synch_direction, ar_forecast_data.nopiigs$synch_direction)
-
-da.pooled.nopiigs = round(sum(diag(table.pooled.nopiigs)) / sum(table.pooled.nopiigs), 4)
-
-hr.pooled.nopiigs = table.pooled.nopiigs[4]/(table.pooled.nopiigs[4]+table.pooled.nopiigs[3])
-
-fa.pooled.nopiigs = table.pooled.nopiigs[2]/(table.pooled.nopiigs[2]+table.pooled.nopiigs[1])
-
-ks.pooled.nopiigs =  hr.pooled.nopiigs - fa.pooled.nopiigs
+cat(dir.results(ar_forecast_data), "\n")
+cat(dir.results(ar_forecast_data.piigs), "\n")
+cat(dir.results(ar_forecast_data.nopiigs), "\n")
 
 ####################################################################################################
 #                                           AR (country-specific) MODELS                           #
@@ -347,76 +291,10 @@ ar.country.data.piigs = ar.country.data %>%
 ar.country.data.nopiigs = ar.country.data %>% 
   filter(!country %in% piigs_subset)
 
-# Compute the RMSE 
 
-rmse.country.specific = ar.country.data %>% 
-  ungroup() %>% 
-  filter(!is.na(res_sq)) %>% 
-  summarise(rmse = sqrt(sum(res_sq) / nrow(ar.country.data%>% 
-                                             filter(!is.na(res_sq)))))
-round(rmse.country.specific,4)
-
-# Now for PIIGS and non-PIIGS
-
-rmse.country.specific.piigs = ar.country.data.piigs %>% 
-  ungroup() %>% 
-  filter(!is.na(res_sq)) %>% 
-  summarise(rmse = sqrt(sum(res_sq) / nrow(ar.country.data.piigs%>% 
-                                             filter(!is.na(res_sq)))))
-
-rmse.country.specific.nopiigs = ar.country.data.nopiigs %>% 
-  ungroup() %>% 
-  filter(!is.na(res_sq)) %>% 
-  summarise(rmse = sqrt(sum(res_sq) / nrow(ar.country.data.nopiigs%>% 
-                                             filter(!is.na(res_sq)))))
-
-# Compute the Directional Accuracy measure 
-
-table.country.specific = table(ar.country.data$f_synch_direction, ar.country.data$synch_direction)
-
-da.country.specific = round(sum(diag(table.country.specific)) / sum(table.country.specific), 4)
-
-
-da.country.specific = round(sum(diag(table.country.specific)) / sum(table.country.specific), 4)
-
-hr.country.specific = table.country.specific[4]/(table.country.specific[4]+table.country.specific[3])
-
-fa.country.specific = table.country.specific[2]/(table.country.specific[2]+table.country.specific[1])
-
-ks.country.specific =  hr.country.specific - fa.country.specific
-
-
-# Do the same for PIIGS 
-
-table.country.specific.piigs = table(ar.country.data.piigs$f_synch_direction, ar.country.data.piigs$synch_direction)
-
-da.country.specific.piigs = round(sum(diag(table.country.specific.piigs)) / sum(table.country.specific.piigs), 4)
-
-
-da.country.specific.piigs = round(sum(diag(table.country.specific.piigs)) / sum(table.country.specific.piigs), 4)
-
-hr.country.specific.piigs = table.country.specific.piigs[4]/(table.country.specific.piigs[4]+table.country.specific.piigs[3])
-
-fa.country.specific.piigs = table.country.specific.piigs[2]/(table.country.specific.piigs[2]+table.country.specific.piigs[1])
-
-ks.country.specific.piigs =  hr.country.specific.piigs - fa.country.specific.piigs
-
-
-# Do the same for non-PIIGS 
-
-table.country.specific.nopiigs = table(ar.country.data.nopiigs$f_synch_direction, ar.country.data.nopiigs$synch_direction)
-
-da.country.specific.nopiigs = round(sum(diag(table.country.specific.nopiigs)) / sum(table.country.specific.nopiigs), 4)
-
-
-da.country.specific.nopiigs = round(sum(diag(table.country.specific.nopiigs)) / sum(table.country.specific.nopiigs), 4)
-
-hr.country.specific.nopiigs = table.country.specific.nopiigs[4]/(table.country.specific.nopiigs[4]+table.country.specific.nopiigs[3])
-
-fa.country.specific.nopiigs = table.country.specific.nopiigs[2]/(table.country.specific.nopiigs[2]+table.country.specific.nopiigs[1])
-
-ks.country.specific.nopiigs =  hr.country.specific.nopiigs - fa.country.specific.nopiigs
-
+cat(dir.results(ar.country.data), "\n")
+cat(dir.results(ar.country.data.piigs), "\n")
+cat(dir.results(ar.country.data.nopiigs), "\n")
 
 # ####################################################################################################
 # #                                           BMA MODELS                                             #
