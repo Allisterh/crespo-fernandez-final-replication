@@ -7,7 +7,7 @@ rm(list = ls())
 
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(DescTools, tidyr, dplyr, readxl, ggplot2, lubridate, zoo, stringr,
-               xtable, stargazer, stats, Hmisc, plm)
+               xtable, stargazer, stats, Hmisc, plm, BMS)
 
 # Load the necessary functions 
 
@@ -207,9 +207,9 @@ cat(dir.results(ar_forecast_data.nopiigs), "\n")
 
 # Print the forecast results without 2020
 
-cat(dir.results(without_2020(ar_forecast_data)), "\n")
-cat(dir.results(without_2020(ar_forecast_data.piigs)), "\n")
-cat(dir.results(without_2020(ar_forecast_data.nopiigs)), "\n")
+cat(dir.results(without.2020(ar_forecast_data)), "\n")
+cat(dir.results(without.2020(ar_forecast_data.piigs)), "\n")
+cat(dir.results(without.2020(ar_forecast_data.nopiigs)), "\n")
 
 ####################################################################################################
 #                                           AR (country-specific) MODELS                           #
@@ -297,10 +297,17 @@ ar.country.data.piigs = ar.country.data %>%
 ar.country.data.nopiigs = ar.country.data %>% 
   filter(!country %in% piigs_subset)
 
+# Print the forecast results for all the sample 
 
 cat(dir.results(ar.country.data), "\n")
 cat(dir.results(ar.country.data.piigs), "\n")
 cat(dir.results(ar.country.data.nopiigs), "\n")
+
+# Print the forecast results without 2020
+
+cat(dir.results(without.2020(ar.country.data)), "\n")
+cat(dir.results(without.2020(ar.country.data.piigs)), "\n")
+cat(dir.results(without.2020(ar.country.data.nopiigs)), "\n")
 
 # ####################################################################################################
 # #                                           BMA MODELS                                             #
@@ -735,72 +742,17 @@ bma.synch.levels.forecast.data.piigs = bma.synch.levels.forecast.data %>%
 bma.synch.levels.forecast.data.nopiigs = bma.synch.levels.forecast.data %>% 
   filter(!country %in% piigs_subset)
 
-# Compute the RMSE
+# Print the forecast results for all the sample 
 
-rmse.bma.synch.levels = bma.synch.levels.forecast.data %>%
-  ungroup() %>%
-  filter(!is.na(res_sq)) %>%
-  summarise(rmse = sqrt(sum(res_sq) / nrow(bma.synch.levels.forecast.data%>%
-                                             filter(!is.na(res_sq)))))
-round(rmse.bma.synch.levels,4)
+cat(dir.results(bma.synch.levels.forecast.data), "\n")
+cat(dir.results(bma.synch.levels.forecast.data.piigs), "\n")
+cat(dir.results(bma.synch.levels.forecast.data.nopiigs), "\n")
 
-# Do the same for PIIGS
+# Print the forecast results without 2020
 
-rmse.bma.synch.levels.piigs = bma.synch.levels.forecast.data.piigs %>%
-  ungroup() %>%
-  filter(!is.na(res_sq)) %>%
-  summarise(rmse = sqrt(sum(res_sq) / nrow(bma.synch.levels.forecast.data.piigs%>%
-                                             filter(!is.na(res_sq)))))
-round(rmse.bma.synch.levels.piigs,4)
-
-
-# Do the same for non-PIIGS
-
-rmse.bma.synch.levels.nopiigs = bma.synch.levels.forecast.data.nopiigs %>%
-  ungroup() %>%
-  filter(!is.na(res_sq)) %>%
-  summarise(rmse = sqrt(sum(res_sq) / nrow(bma.synch.levels.forecast.data.nopiigs%>%
-                                             filter(!is.na(res_sq)))))
-round(rmse.bma.synch.levels.nopiigs,4)
-
-# Compute the Directional Accuracy measure
-
-table.bma.synch.levels= table(bma.synch.levels.forecast.data$f_synch_direction, bma.synch.levels.forecast.data$synch_direction)
-
-da.bma.synch.levels = round(sum(diag(table.bma.synch.levels)) / sum(table.bma.synch.levels), 4)
-
-hr.bma.synch.levels = table.bma.synch.levels[4]/(table.bma.synch.levels[4]+table.bma.synch.levels[3])
-
-fa.bma.synch.levels = table.bma.synch.levels[2]/(table.bma.synch.levels[2]+table.bma.synch.levels[1])
-
-ks.bma.synch.levels =  hr.bma.synch.levels - fa.bma.synch.levels
-
-
-# Do the same for PIIGS
-
-table.bma.synch.levels.piigs = table(bma.synch.levels.forecast.data.piigs$f_synch_direction, bma.synch.levels.forecast.data.piigs$synch_direction)
-
-da.bma.synch.levels.piigs = round(sum(diag(table.bma.synch.levels.piigs)) / sum(table.bma.synch.levels.piigs), 4)
-
-hr.bma.synch.levels.piigs = table.bma.synch.levels.piigs[4]/(table.bma.synch.levels[4]+table.bma.synch.levels.piigs[3])
-
-fa.bma.synch.levels.piigs = table.bma.synch.levels.piigs[2]/(table.bma.synch.levels.piigs[2]+table.bma.synch.levels.piigs[1])
-
-ks.bma.synch.levels.piigs =  hr.bma.synch.levels.piigs - fa.bma.synch.levels.piigs
-
-# Do the same for non-PIIGS
-
-
-table.bma.synch.levels.nopiigs = table(bma.synch.levels.forecast.data.nopiigs$f_synch_direction, bma.synch.levels.forecast.data.nopiigs$synch_direction)
-
-da.bma.synch.levels.nopiigs = round(sum(diag(table.bma.synch.levels.nopiigs)) / sum(table.bma.synch.levels.nopiigs), 4)
-
-hr.bma.synch.levels.nopiigs = table.bma.synch.levels.nopiigs[4]/(table.bma.synch.levels[4]+table.bma.synch.levels.nopiigs[3])
-
-fa.bma.synch.levels.nopiigs = table.bma.synch.levels.nopiigs[2]/(table.bma.synch.levels.nopiigs[2]+table.bma.synch.levels.nopiigs[1])
-
-ks.bma.synch.levels.nopiigs =  hr.bma.synch.levels.nopiigs - fa.bma.synch.levels.nopiigs
-
+cat(dir.results(without.2020(bma.synch.levels.forecast.data)), "\n")
+cat(dir.results(without.2020(bma.synch.levels.forecast.data.piigs)), "\n")
+cat(dir.results(without.2020(bma.synch.levels.forecast.data.nopiigs)), "\n")
 
 # Arrange by country and date for consistency
 
@@ -909,105 +861,17 @@ bma.synch.synch.forecast.data.piigs = bma.synch.synch.forecast.data %>%
 bma.synch.synch.forecast.data.nopiigs = bma.synch.synch.forecast.data %>% 
   filter(!country %in% piigs_subset)
 
-# Compute the RMSE
+# Print the forecast results for all the sample 
 
-rmse.bma.synch.synch = bma.synch.synch.forecast.data %>%
-  ungroup() %>%
-  filter(!is.na(res_sq)) %>%
-  summarise(rmse = sqrt(sum(res_sq) / nrow(ar_forecast_data%>%
-                                             filter(!is.na(res_sq)))))
+cat(dir.results(bma.synch.synch.forecast.data), "\n")
+cat(dir.results(bma.synch.synch.forecast.data.piigs), "\n")
+cat(dir.results(bma.synch.synch.forecast.data.nopiigs), "\n")
 
-round(rmse.bma.synch.synch,4)
+# Print the forecast results without 2020
 
-# Do the same for PIIGS 
-
-
-rmse.bma.synch.synch.piigs = bma.synch.synch.forecast.data.piigs %>%
-  ungroup() %>%
-  filter(!is.na(res_sq)) %>%
-  summarise(rmse = sqrt(sum(res_sq) / nrow(bma.synch.synch.forecast.data.piigs%>%
-                                             filter(!is.na(res_sq)))))
-
-round(rmse.bma.synch.synch.piigs,4)
-
-# Do the same for non-PIIGS
-
-
-
-rmse.bma.synch.synch.nopiigs = bma.synch.synch.forecast.data.nopiigs %>%
-  ungroup() %>%
-  filter(!is.na(res_sq)) %>%
-  summarise(rmse = sqrt(sum(res_sq) / nrow(bma.synch.synch.forecast.data.nopiigs%>%
-                                             filter(!is.na(res_sq)))))
-
-round(rmse.bma.synch.synch.nopiigs,4)
-
-
-
-# Compute the Directional Accuracy measure
-
-table.bma.synch.synch = table(bma.synch.synch.forecast.data$f_synch_direction, bma.synch.synch.forecast.data$synch_direction)
-
-da.bma.synch.synch = round(sum(diag(table.bma.synch.synch)) / sum(table.bma.synch.synch), 4)
-
-
-hr.bma.synch.synch = table.bma.synch.synch[4]/(table.bma.synch.synch[4]+table.bma.synch.synch[3])
-
-fa.bma.synch.synch = table.bma.synch.synch[2]/(table.bma.synch.synch[2]+table.bma.synch.synch[1])
-
-ks.bma.synch.synch =  hr.bma.synch.synch - fa.bma.synch.synch
-
-# Do the same for PIIGS
-
-table.bma.synch.synch.piigs = table(bma.synch.synch.forecast.data.piigs$f_synch_direction, bma.synch.synch.forecast.data.piigs$synch_direction)
-
-da.bma.synch.synch.piigs = round(sum(diag(table.bma.synch.synch.piigs)) / sum(table.bma.synch.synch.piigs), 4)
-
-
-hr.bma.synch.synch.piigs = table.bma.synch.synch.piigs[4]/(table.bma.synch.synch.piigs[4]+table.bma.synch.synch.piigs[3])
-
-fa.bma.synch.synch.piigs = table.bma.synch.synch.piigs[2]/(table.bma.synch.synch.piigs[2]+table.bma.synch.synch.piigs[1])
-
-ks.bma.synch.synch.piigs =  hr.bma.synch.synch.piigs - fa.bma.synch.synch.piigs
-
-# Do the same for non-PIIGS
-
-table.bma.synch.synch.nopiigs = table(bma.synch.synch.forecast.data.nopiigs$f_synch_direction, bma.synch.synch.forecast.data.nopiigs$synch_direction)
-
-da.bma.synch.synch.nopiigs = round(sum(diag(table.bma.synch.synch.nopiigs)) / sum(table.bma.synch.synch.nopiigs), 4)
-
-
-hr.bma.synch.synch.nopiigs = table.bma.synch.synch.nopiigs[4]/(table.bma.synch.synch.nopiigs[4]+table.bma.synch.synch.nopiigs[3])
-
-fa.bma.synch.synch.nopiigs = table.bma.synch.synch.nopiigs[2]/(table.bma.synch.synch.nopiigs[2]+table.bma.synch.synch.nopiigs[1])
-
-ks.bma.synch.synch.nopiigs =  hr.bma.synch.synch.nopiigs - fa.bma.synch.synch.nopiigs
-
-
-
-# Create rows of final table # 
-
-# All countries # 
-
-round(c(rmse.pooled$rmse, da.pooled, hr.pooled, fa.pooled, ks.pooled),4)
-round(c(rmse.country.specific$rmse, da.country.specific, hr.country.specific, fa.country.specific, ks.country.specific),4)
-round(c(rmse.bma.synch.levels$rmse, da.bma.synch.levels, hr.bma.synch.levels, fa.bma.synch.levels, ks.bma.synch.levels),4)
-round(c(rmse.bma.synch.synch$rmse, da.bma.synch.synch, hr.bma.synch.synch, fa.bma.synch.synch, ks.bma.synch.synch),4)
-
-
-# PIIGS countries #
-
-round(c(rmse.pooled.piigs$rmse, da.pooled.piigs, hr.pooled.piigs, fa.pooled.piigs, ks.pooled.piigs),4)
-round(c(rmse.country.specific.piigs$rmse, da.country.specific.piigs, hr.country.specific.piigs, fa.country.specific.piigs, ks.country.specific.piigs),4)
-round(c(rmse.bma.synch.levels.piigs$rmse, da.bma.synch.levels.piigs, hr.bma.synch.levels.piigs, fa.bma.synch.levels.piigs, ks.bma.synch.levels.piigs),4)
-round(c(rmse.bma.synch.synch.piigs$rmse, da.bma.synch.synch.piigs, hr.bma.synch.synch.piigs, fa.bma.synch.synch.piigs, ks.bma.synch.synch.piigs),4)
-
-# Non-PIIGS countries
-
-round(c(rmse.pooled.nopiigs$rmse, da.pooled.nopiigs, hr.pooled.nopiigs, fa.pooled.nopiigs, ks.pooled.nopiigs),4)
-round(c(rmse.country.specific.nopiigs$rmse, da.country.specific.nopiigs, hr.country.specific.nopiigs, fa.country.specific.nopiigs, ks.country.specific.nopiigs),4)
-round(c(rmse.bma.synch.levels.nopiigs$rmse, da.bma.synch.levels.nopiigs, hr.bma.synch.levels.nopiigs, fa.bma.synch.levels.nopiigs, ks.bma.synch.levels.nopiigs),4)
-round(c(rmse.bma.synch.synch.nopiigs$rmse, da.bma.synch.synch.nopiigs, hr.bma.synch.synch.nopiigs, fa.bma.synch.synch.nopiigs, ks.bma.synch.synch.nopiigs),4)
+cat(dir.results(without.2020(bma.synch.synch.forecast.data)), "\n")
+cat(dir.results(without.2020(bma.synch.synch.forecast.data.piigs)), "\n")
+cat(dir.results(without.2020(bma.synch.synch.forecast.data.nopiigs)), "\n")
 
 # Run the following code to find those variables with PIP>50%
 
