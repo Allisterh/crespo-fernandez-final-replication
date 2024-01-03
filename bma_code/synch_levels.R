@@ -189,9 +189,21 @@ my_func = function(my_country) {
   
 }
 
-# Example below for Austria
+# Get the summary statistics for each country in the sample
 
-my_func("austria")
+all_countries = c("austria", "belgium", "finland", 
+                  "france", "germany", "greece", 
+                  "ireland", "italy", "latvia", 
+                  "lithuania", "netherlands", "portugal", 
+                  "slovakia", "slovenia", "spain")
+
+for (mycountry in all_countries) {
+  
+  print(mycountry)
+  my_func(mycountry)
+  
+  
+}
 
 
 # Add Draghi dummy + interactions
