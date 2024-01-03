@@ -10,7 +10,7 @@ This readme file is intended to help the readers of the journal ECONOMIC MODELLI
 
 The zipped folder attached contains three folders with all the necessary data files and codes to reproduce the results of the paper:
 
-1. matlab plots: this folder contains one Matlab code file and two data files. The code file figure1_figure2.m reads two data files: s_t.xlsx, which contains the data on the standard deviation in long-term government bond yields, and yields data.xlsx, which contains data on the yield spread (against the German yield) for the GIIPS countries. The Matlab code thus reproduces the following figures found in the paper: Figure 1, Figure 2.
+1. matlab_plots: this folder contains one Matlab code file and two data files. The code file figure1_figure2.m reads two data files: s_t.xlsx, which contains the data on the standard deviation in long-term government bond yields, and yields data.xlsx, which contains data on the yield spread (against the German yield) for the GIIPS countries. The Matlab code thus reproduces the following figures found in the paper: Figure 1, Figure 2.
 
 2. funcs: this folder contains .R functions that are called by the other .R code files for the sake of computational speed. Note: the function jointness_function.R is used to compute the jointness measures we depict in Figures A.1-A.6. The code is sourced from Amini, S., & Parmeter, C. F. (2020). A review of the “BMS” package for R with focus on jointness. Econometrics, 8(1), 6.
 
