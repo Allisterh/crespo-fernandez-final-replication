@@ -1,7 +1,14 @@
 # "Explaining Long-Term Bond Yields Synchronization Dynamics in Europe"  Replication Package (Crespo \& Fernandez, 2023)
 
 
-This readme file is intended to help the editors of the journal ECONOMIC MODELLING to replicate the results of the paper titled “Explaining Long-Term Bond Yields Synchronization Dynamics in Europe”, written by Jesus Crespo Cuaresma and Oscar Fernandez. The zipped folder attached contains three folders with all the necessary data files and codes to reproduce the results of the paper:
+This readme file is intended to help the editors of the journal ECONOMIC MODELLING to replicate the results of the paper titled “Explaining Long-Term Bond Yields Synchronization Dynamics in Europe”, written by Jesus Crespo Cuaresma and Oscar Fernandez. 
+
+
+**IMPORTANT NOTE 1:** to fully reproduce the results with the same seed, the researcher needs to use an old version of the package BMS, which is the one we used for the paper. More specifically, the researcher needs to download in R the version 0.3.4 of the BMS package here: https://cran.r-project.org/src/contrib/Archive/BMS/. This will make sure that the seed and the corresponding results are always the same, which in our case is set to "set.seed(14091998)". The update to the version 0.3.5 made the setting of the seed a little more complicated, which is why we preferred to stick to the version 0.3.4. 
+
+**IMPORTANT NOTE 2:** all the codes were run in a Macbook Air with an Apple M1 chip, 16 GB of memory, Sonoma 14.1.2. The R version used is 4.2.2. It is advised to use the same R version to avoid issues with the BMS package version 0.3.4. 
+
+The zipped folder attached contains three folders with all the necessary data files and codes to reproduce the results of the paper:
 
 1. matlab plots: this folder contains two Matlab code files and two data files. The code file figure1 figure2.m reads two data files: s_t.xlsx, which contains the data on the standard deviation in long-term government bond yields, and yields data.xlsx, which contains data on the yield spread (against the German yield) for the GIIPS countries. The code thus reproduces the following figures found in the paper: Figure 1, Figure 2.
 
