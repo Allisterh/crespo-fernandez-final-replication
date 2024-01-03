@@ -6,7 +6,7 @@ This readme file is intended to help the editors of the journal ECONOMIC MODELLI
 
 **IMPORTANT NOTE 1:** to fully reproduce the results with the same seed, the researcher needs to use an old version of the package BMS, which is the one we used for the paper. More specifically, the researcher needs to download in R the version 0.3.4 of the BMS package here: https://cran.r-project.org/src/contrib/Archive/BMS/. This will make sure that the seed and the corresponding results are always the same, which in our case is set to "set.seed(14091998)". The update to the version 0.3.5 made the setting of the seed a little more complicated, which is why we preferred to stick to the version 0.3.4. 
 
-**IMPORTANT NOTE 2:** all the codes were run in a Macbook Air with an Apple M1 chip, 16 GB of memory, Sonoma 14.1.2. The R version used is 4.2.2. It is advised to use the same R version to avoid issues with the BMS package version 0.3.4. To download the R version 4.2.2, the researcher can follow [this link](https://cran.r-project.org/bin/windows/base/old/)
+**IMPORTANT NOTE 2:** all the codes were run in a Macbook Air with an Apple M1 chip, 16 GB of memory, Sonoma 14.1.2. The R version used is 4.2.2. It is advised to use the same R version to avoid issues with the BMS package version 0.3.4. To download the R version 4.2.2, the researcher can follow this link: [https://cran.r-project.org/bin/windows/base/old/](https://cran.r-project.org/bin/windows/base/old/)
 
 The zipped folder attached contains three folders with all the necessary data files and codes to reproduce the results of the paper:
 
