@@ -341,6 +341,6 @@ coefs_heredity = coefs_heredity[!row.names(coefs_heredity) %in% year_dummy_names
 
 # Reproduce all columns of Table A.4 in the paper 
 
-coefs_fe
-coefs_nofe
-coefs_heredity
+round(coefs_fe, 4)
+round(coefs_nofe, 4)
+round(coefs_heredity, 4)
