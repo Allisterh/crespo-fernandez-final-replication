@@ -17,13 +17,13 @@ n.iter = 1e7
 
 data_path = "../bma_data"
 
-fulldata = read_excel(file.path(data_path, "spread_levels.xlsx"))
+fulldata = readxl::read_excel(file.path(data_path, "spread_levels.xlsx"))
 
 
 # Add Draghi dummy + interactions
 
 fulldata = fulldata %>% 
-  mutate(draghi = ifelse(date >= '2012-07-01', 1, 0), 
+  dplyr::mutate(draghi = ifelse(date >= '2012-07-01', 1, 0), 
          draghispread_lag1 = draghi * spread_lag1, 
          draghispread_lag2 = draghi * spread_lag2, 
          draghispread_lag3 = draghi * spread_lag3, 
@@ -103,9 +103,9 @@ country_dummy_names = c("d_belgium",
 
 
 fe_data = fulldata %>% 
-  select(-date,-uncert,-bop,-debttogdp,-gdp,-euribor,-inflation) %>% 
+  dplyr::select(-date,-uncert,-bop,-debttogdp,-gdp,-euribor,-inflation) %>% 
   
-  mutate(d_belgium = ifelse(country == "belgium", 1 , 0),
+  dplyr::mutate(d_belgium = ifelse(country == "belgium", 1 , 0),
          d_finland = ifelse(country == "finland", 1 , 0),
          d_france = ifelse(country == "france", 1 , 0),
          d_germany = ifelse(country == "germany", 1 , 0),
@@ -120,7 +120,7 @@ fe_data = fulldata %>%
          d_slovenia = ifelse(country == "slovenia", 1 , 0),
          d_spain = ifelse(country == "spain", 1 , 0)) %>%
   
-  mutate(d_2002 = ifelse(year == 2002, 1 , 0),
+  dplyr::mutate(d_2002 = ifelse(year == 2002, 1 , 0),
          d_2003 = ifelse(year == 2003, 1 , 0),
          d_2004 = ifelse(year == 2004, 1 , 0),
          d_2005 = ifelse(year == 2005, 1 , 0),
@@ -140,14 +140,14 @@ fe_data = fulldata %>%
          d_2019 = ifelse(year == 2019, 1 , 0),
          d_2020 = ifelse(year == 2020, 1 , 0),
          d_2021 = ifelse(year == 2021, 1 , 0)) %>% 
-  select(-year,-country, -pigs)
+  dplyr::select(-year,-country, -pigs)
 
-model_fe <-  bms(fe_data, burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random", 
+model_fe <-  BMS::bms(fe_data, burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random", 
                  nmodel = 10000, mcmc = "bd", user.int = F, randomizeTimer = F, 
                  fixed.reg = c(year_dummy_names, country_dummy_names))
 
 
-coefs_fe <- coef(model_fe,  std.coefs = T, order.by.pip = F)
+coefs_fe <- stats::coef(model_fe,  std.coefs = T, order.by.pip = F)
 
 # Do not select the Fixed Effects results (year & country) #
 
@@ -157,9 +157,9 @@ coefs_fe = coefs_fe[!row.names(coefs_fe) %in% c(country_dummy_names, year_dummy_
 # Model without Fixed Effects: add only time (year) fixed effects  #
 
 nofe_data = fulldata %>% 
-  select(-date,-uncert,-bop,-debttogdp,-gdp,-euribor,-inflation) %>%
+  dplyr::select(-date,-uncert,-bop,-debttogdp,-gdp,-euribor,-inflation) %>%
   
-  mutate(d_2002 = ifelse(year == 2002, 1 , 0),
+  dplyr::mutate(d_2002 = ifelse(year == 2002, 1 , 0),
          d_2003 = ifelse(year == 2003, 1 , 0),
          d_2004 = ifelse(year == 2004, 1 , 0),
          d_2005 = ifelse(year == 2005, 1 , 0),
@@ -180,16 +180,16 @@ nofe_data = fulldata %>%
          d_2020 = ifelse(year == 2020, 1 , 0),
          d_2021 = ifelse(year == 2021, 1 , 0)) %>% 
   
-  select(-year,-country)
+  dplyr::select(-year,-country)
 
 
 
-model_nofe <- bms(nofe_data, burn = n.burn, iter = n.iter,  g = "BRIC", mprior = "random", 
+model_nofe <- BMS::bms(nofe_data, burn = n.burn, iter = n.iter,  g = "BRIC", mprior = "random", 
                   nmodel = 10000, mcmc = "bd", user.int = F, randomizeTimer = F, 
                   fixed.reg = year_dummy_names)
 
 
-coefs_nofe <- coef(model_nofe,  std.coefs = T, order.by.pip = F)[,1:3]
+coefs_nofe <- stats::coef(model_nofe,  std.coefs = T, order.by.pip = F)[,1:3]
 
 # Do not select year fixed effects #
 
@@ -199,10 +199,10 @@ coefs_nofe = coefs_nofe[!row.names(coefs_nofe) %in% c(year_dummy_names),1:3]
 # Note that this is the same dataset used for the no Fixed Effects model #
 
 heredity_data = fulldata %>% 
-  select(-date,-uncert,-bop,-debttogdp,-gdp,-euribor,-inflation) %>% 
+  dplyr::select(-date,-uncert,-bop,-debttogdp,-gdp,-euribor,-inflation) %>% 
   
   
-  mutate(d_2002 = ifelse(year == 2002, 1 , 0),
+  dplyr::mutate(d_2002 = ifelse(year == 2002, 1 , 0),
          d_2003 = ifelse(year == 2003, 1 , 0),
          d_2004 = ifelse(year == 2004, 1 , 0),
          d_2005 = ifelse(year == 2005, 1 , 0),
@@ -222,14 +222,14 @@ heredity_data = fulldata %>%
          d_2019 = ifelse(year == 2019, 1 , 0),
          d_2020 = ifelse(year == 2020, 1 , 0),
          d_2021 = ifelse(year == 2021, 1 , 0)) %>% 
-  select(-year,-country)
+  dplyr::select(-year,-country)
 
 
 # Need to change interaction variable names #
 # For consistency with BMS package # 
 
 heredity_data = heredity_data %>% 
-  rename("rec#spread_lag1" = recspread_lag1,
+  dplyr::rename("rec#spread_lag1" = recspread_lag1,
          "rec#spread_lag2" = recspread_lag2,
          "rec#spread_lag3" = recspread_lag3,
          "rec#spread_lag4" = recspread_lag4,
@@ -328,12 +328,12 @@ heredity_data = heredity_data %>%
          "draghi#inflation_lag4" = draghiinflation_lag4)
 
 
-model_heredity =  bms(heredity_data, burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random", 
+model_heredity =  BMS::bms(heredity_data, burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random", 
                       nmodel = 10000, mcmc = "bd.int", user.int = F, randomizeTimer = F, 
                       fixed.reg = year_dummy_names)
 
 
-coefs_heredity <- coef(model_heredity,  std.coefs = T, order.by.pip = F)
+coefs_heredity <- stats::coef(model_heredity,  std.coefs = T, order.by.pip = F)
 
 # Do not select the year fixed effects #
 
@@ -341,6 +341,6 @@ coefs_heredity = coefs_heredity[!row.names(coefs_heredity) %in% year_dummy_names
 
 # Reproduce all columns of Table A.4 in the paper 
 
-round(coefs_fe, 4)
-round(coefs_nofe, 4)
-round(coefs_heredity, 4)
+base::round(coefs_fe, 4)
+base::round(coefs_nofe, 4)
+base::round(coefs_heredity, 4)
