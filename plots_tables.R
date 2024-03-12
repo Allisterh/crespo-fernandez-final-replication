@@ -13,6 +13,28 @@ for (file in func.files) {
   
 }
 
+# Produce Figure 1 in the paper (originally in Matlab)
+
+readxl::read_xls(file.path(data_path, "yields_data.xls"), range = "A16:G287") %>% 
+  `colnames<-`(c("date","spain", "greece", "portugal", "italy", "ireland", "germany")) %>% 
+  mutate(across(spain:ireland, ~ .x - germany), 
+         greece = dplyr::if_else(date==as.Date("2015-07-01"), NA, greece)) %>% 
+  ggplot2::ggplot(aes(x = date)) + 
+  ggplot2::geom_line(aes(y = spain, colour="Spain")) + 
+  ggplot2::geom_line(aes(y = greece, colour="Greece")) + 
+  ggplot2::geom_line(aes(y = portugal, colour="Portugal")) + 
+  ggplot2::geom_line(aes(y = italy, colour="Italy")) + 
+  ggplot2::geom_line(aes(y = ireland, colour="Ireland")) +
+  scale_color_manual(name = "", values = c("Spain" = "darkblue", "Greece" = "red", 
+                                           "Portugal" = "green", "Italy" = "lightblue", 
+                                           "Ireland" = "yellow")) +
+  ggplot2::theme_light() +
+  labs(x = "", y = "Spread against German yield (in %)") + 
+  guides(fill=guide_legend(ncol=3)) +
+  theme(legend.position = c(0.3, 0.7), 
+        legend.background = element_blank(),
+        legend.box.background = element_rect(colour = "black"))
+
 
 # Produce state-dependent synchronization tests (Table A.3 in the paper)
 
