@@ -243,7 +243,7 @@ max.jointness.dw2 = max.jointness.dw2 %>%
 
 
 max.jointness.ls2 = max.jointness.ls2 %>% 
-  mutate(pair = base::paste(pmin(as.character(Var1), as.character(Var2)), 
+  dplyr::mutate(pair = base::paste(pmin(as.character(Var1), as.character(Var2)), 
                       pmax(as.character(Var1), as.character(Var2)), sep = '-')) %>% 
   dplyr::distinct(pair) %>% 
   dplyr::filter(!grepl('d_',pair))
@@ -297,14 +297,14 @@ jointness.dw2 %>%
 jointness.ls2 %>% 
   dplyr::filter(!grepl("d_", Var1)) %>% 
   dplyr::filter(!grepl("d_", Var2)) %>% 
-  ggplot2:ggplot(aes(Var1, Var2, fill= value)) + 
-  ggplot2:geom_tile() + 
-  ggplot2:theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
-  ggplot2:labs(x = "", y = "") + 
-  ggplot2:theme(axis.text=element_text(size=5)) +  
-  ggplot2:scale_fill_continuous( low = "black", high = "red") +
-  ggplot2:theme(legend.text = element_text(size=7), legend.title = element_blank()) + 
-  ggplot2:guides(fill = guide_colourbar(barwidth = 0.5,
+  ggplot2::ggplot(aes(Var1, Var2, fill= value)) + 
+  ggplot2::geom_tile() + 
+  ggplot2::theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  ggplot2::labs(x = "", y = "") + 
+  ggplot2::theme(axis.text=element_text(size=5)) +  
+  ggplot2::scale_fill_continuous( low = "black", high = "red") +
+  ggplot2::theme(legend.text = element_text(size=7), legend.title = element_blank()) + 
+  ggplot2::guides(fill = guide_colourbar(barwidth = 0.5,
                                 barheight = 20))
 
 
