@@ -5,34 +5,16 @@
 
 rm(list = ls())
 
-if (!require("pacman")) install.packages("pacman")
-pacman::p_load(DescTools, tidyr, dplyr, readxl, ggplot2, lubridate, zoo, stringr,
-               xtable, stargazer, stats, Hmisc, plm, BMS)
+# Load the necessary functions, packages, and specifications
 
-# Load the necessary functions 
-
-func.files <- list.files(path = "../funcs", pattern = "\\.R$", full.names = TRUE)
+func.files <- base::list.files(path = "./", pattern = "^~", full.names = TRUE)
 
 for (file in func.files) {
   
-  source(file)
+  base::source(file)
   
 }
 
-# Set seed and number of iterations + burnin phase
-
-set.seed(14091998)
-n.iter = 500000
-n.burn = 10000
-
-# Read the dataset, set WD #
-
-data_path = "../bma_data"
-
-
-# Create PIIGS subset # 
-
-piigs_subset = c("portugal", "ireland", "italy", "greece", "spain")
 
 # Create variables for year because we need to include different
 # year fixed effects at certain forecasting horizons (note: 2001 is the baseline)
@@ -40,54 +22,13 @@ piigs_subset = c("portugal", "ireland", "italy", "greece", "spain")
 synch_synch_data_pip = read_excel(file.path(data_path, "synch_synch.xlsx")) %>% 
   mutate(date = as.Date(date)) %>% 
   filter(date <= as.Date("2020-10-01")) %>% 
-  mutate(draghi = ifelse(date >= '2012-07-01', 1, 0), 
-         draghisynch_lag1 = draghi * synch_lag1, 
-         draghisynch_lag2 = draghi * synch_lag2, 
-         draghisynch_lag3 = draghi * synch_lag3, 
-         draghisynch_lag4 = draghi * synch_lag4, 
-         draghiuncert_lag1 = draghi * uncert_lag1,
-         draghiuncert_lag2 = draghi * uncert_lag2,
-         draghiuncert_lag3 = draghi * uncert_lag3,
-         draghiuncert_lag4 = draghi * uncert_lag4, 
-         draghigdp_lag1 = draghi * gdp_lag1, 
-         draghigdp_lag2 = draghi * gdp_lag2,
-         draghigdp_lag3 = draghi * gdp_lag3,
-         draghigdp_lag4 = draghi * gdp_lag4, 
-         draghibop_lag1 = draghi * bop_lag1, 
-         draghibop_lag2 = draghi * bop_lag2,
-         draghibop_lag3 = draghi * bop_lag3,
-         draghibop_lag4 = draghi * bop_lag4, 
-         draghidebttogdp_lag1 = draghi * debttogdp_lag1, 
-         draghidebttogdp_lag2 = draghi * debttogdp_lag2, 
-         draghidebttogdp_lag3 = draghi * debttogdp_lag3, 
-         draghidebttogdp_lag4 = draghi * debttogdp_lag4, 
-         draghiinflation_lag1 = draghi * inflation_lag1, 
-         draghiinflation_lag2 = draghi * inflation_lag2,
-         draghiinflation_lag3 = draghi * inflation_lag3,
-         draghiinflation_lag4 = draghi * inflation_lag4) %>% 
-  mutate(d_2002 = ifelse(year == 2002, 1 , 0),
-         d_2003 = ifelse(year == 2003, 1 , 0),
-         d_2004 = ifelse(year == 2004, 1 , 0),
-         d_2005 = ifelse(year == 2005, 1 , 0),
-         d_2006 = ifelse(year == 2006, 1 , 0),
-         d_2007 = ifelse(year == 2007, 1 , 0),
-         d_2008 = ifelse(year == 2008, 1 , 0),
-         d_2009 = ifelse(year == 2009, 1 , 0),
-         d_2010 = ifelse(year == 2010, 1 , 0),
-         d_2011 = ifelse(year == 2011, 1 , 0),
-         d_2012 = ifelse(year == 2012, 1 , 0),
-         d_2013 = ifelse(year == 2013, 1 , 0),
-         d_2014 = ifelse(year == 2014, 1 , 0),
-         d_2015 = ifelse(year == 2015, 1 , 0),
-         d_2016 = ifelse(year == 2016, 1 , 0),
-         d_2017 = ifelse(year == 2017, 1 , 0),
-         d_2018 = ifelse(year == 2018, 1 , 0),
-         d_2019 = ifelse(year == 2019, 1 , 0),
-         d_2020 = ifelse(year == 2020, 1 , 0))
+  add.draghi.synch() %>% 
+  dummy_cols(select_columns = "year", remove_first_dummy = T) 
 
-year_dummy_names = c("d_2002","d_2003","d_2004","d_2005","d_2006","d_2007","d_2008",
-                     "d_2009","d_2010","d_2011","d_2012","d_2013","d_2014","d_2015",
-                     "d_2016","d_2017","d_2018","d_2019", "d_2020")
+
+year_dummy_names = c("year_2002","year_2003","year_2004","year_2005","year_2006","year_2007","year_2008",
+                     "year_2009","year_2010","year_2011","year_2012","year_2013","year_2014","year_2015",
+                     "year_2016","year_2017","year_2018","year_2019", "year_2020")
 
 
 ####################################################################################################
@@ -111,56 +52,56 @@ synch_synch_pip_forecast_data = complete(synch_synch_pip_forecast_data, country,
 ar.synch.synch.pip50.1 = lm(synch ~ country+	draghiinflation_lag4 +draghisynch_lag1+ draghisynch_lag2+
                               draghisynch_lag3 +draghisynch_lag4+ pigsdebttogdp_lag2 +pigsinflation_lag3 +pigsinflation_lag4 +
                               recsynch_lag1+ recsynch_lag2 +recsynch_lag4+ synch_lag1+ zlbdebttogdp_lag3 +zlbdebttogdp_lag4 +zlbinflation_lag2 +
-                              zlbinflation_lag3+ zlbsynch_lag1+ zlbsynch_lag2+d_2002+ d_2003+ d_2004+ d_2005+ d_2006+ d_2007+
-                               d_2008+ d_2009+ d_2010+ d_2011+ d_2012+ d_2013+ d_2014+ d_2015+ d_2016+ d_2017 +d_2018, data = synch_synch_data_pip %>% 
+                              zlbinflation_lag3+ zlbsynch_lag1+ zlbsynch_lag2+year_2002+ year_2003+ year_2004+ year_2005+ year_2006+ year_2007+
+                               year_2008+ year_2009+ year_2010+ year_2011+ year_2012+ year_2013+ year_2014+ year_2015+ year_2016+ year_2017 +year_2018, data = synch_synch_data_pip %>% 
                                filter(date <= as.Date("2018-10-01"))) 
 
 ar.synch.synch.pip50.2 = lm(synch ~ country+draghiinflation_lag4+ draghisynch_lag1 +draghisynch_lag2+
                               draghisynch_lag3+ draghisynch_lag4 +pigsdebttogdp_lag2+ pigsinflation_lag3+
                               pigsinflation_lag4+ recsynch_lag1 +recsynch_lag2+ recsynch_lag4+ synch_lag1+
-                              zlbdebttogdp_lag3 +d_2002+ d_2003+ d_2004+ d_2005+ d_2006+ d_2007+
-                               d_2008+ d_2009+ d_2010+ d_2011+ d_2012+ d_2013+ d_2014+ d_2015+ d_2016+ d_2017 +d_2018+d_2019, data = synch_synch_data_pip %>% 
+                              zlbdebttogdp_lag3 +year_2002+ year_2003+ year_2004+ year_2005+ year_2006+ year_2007+
+                               year_2008+ year_2009+ year_2010+ year_2011+ year_2012+ year_2013+ year_2014+ year_2015+ year_2016+ year_2017 +year_2018+year_2019, data = synch_synch_data_pip %>% 
                                mutate(date = as.Date(date)) %>% 
                                filter(date <= as.Date("2019-01-01"))) 
 
 ar.synch.synch.pip50.3 = lm(synch ~ country +draghiinflation_lag4 +draghisynch_lag1+ draghisynch_lag2 +draghisynch_lag4 +
                               pigsdebttogdp_lag2 +pigsinflation_lag3+ pigsinflation_lag4+ recsynch_lag1+ recsynch_lag2+
                               recsynch_lag4 +synch_lag1 +zlbdebttogdp_lag3+ zlbdebttogdp_lag4 +zlbinflation_lag3 +zlbsynch_lag1 +
-                              zlbsynch_lag2+d_2002+ d_2003+ d_2004+ d_2005+ d_2006+ d_2007+
-                               d_2008+ d_2009+ d_2010+ d_2011+ d_2012+ d_2013+ d_2014+ d_2015+ d_2016+ d_2017 +d_2018+d_2019, data = synch_synch_data_pip %>% 
+                              zlbsynch_lag2+year_2002+ year_2003+ year_2004+ year_2005+ year_2006+ year_2007+
+                               year_2008+ year_2009+ year_2010+ year_2011+ year_2012+ year_2013+ year_2014+ year_2015+ year_2016+ year_2017 +year_2018+year_2019, data = synch_synch_data_pip %>% 
                                mutate(date = as.Date(date)) %>% 
                                filter(date <= as.Date("2019-04-01")))
 
 ar.synch.synch.pip50.4 = lm(synch ~  country  +draghiinflation_lag4+ draghisynch_lag1+ draghisynch_lag2+ draghisynch_lag4+
                               pigsdebttogdp_lag2 +pigsinflation_lag3 +pigsinflation_lag4+ recsynch_lag1 +recsynch_lag2 +recsynch_lag4 +
-                              synch_lag1+ zlbdebttogdp_lag3+ zlbdebttogdp_lag4+ zlbinflation_lag3+ zlbsynch_lag1+ zlbsynch_lag2+ zlbsynch_lag3+d_2002+ d_2003+ d_2004+ d_2005+ d_2006+ d_2007+
-                               d_2008+ d_2009+ d_2010+ d_2011+ d_2012+ d_2013+ d_2014+ d_2015+ d_2016+ d_2017 +d_2018+d_2019, data = synch_synch_data_pip %>% 
+                              synch_lag1+ zlbdebttogdp_lag3+ zlbdebttogdp_lag4+ zlbinflation_lag3+ zlbsynch_lag1+ zlbsynch_lag2+ zlbsynch_lag3+year_2002+ year_2003+ year_2004+ year_2005+ year_2006+ year_2007+
+                               year_2008+ year_2009+ year_2010+ year_2011+ year_2012+ year_2013+ year_2014+ year_2015+ year_2016+ year_2017 +year_2018+year_2019, data = synch_synch_data_pip %>% 
                                mutate(date = as.Date(date)) %>% 
                                filter(date <= as.Date("2019-07-01")))
 
 ar.synch.synch.pip50.5 = lm(synch ~ country +draghiinflation_lag4 +draghisynch_lag1 +draghisynch_lag2+ pigsinflation_lag3 +pigsinflation_lag4 +
                               recsynch_lag1+ recsynch_lag2+ synch_lag1+ zlbdebttogdp_lag3+ zlbdebttogdp_lag4+ zlbinflation_lag2+
-                              zlbinflation_lag3 +zlbsynch_lag1 +zlbsynch_lag2 +zlbsynch_lag3+d_2002+ d_2003+ d_2004+ d_2005+ d_2006+ d_2007+
-                               d_2008+ d_2009+ d_2010+ d_2011+ d_2012+ d_2013+ d_2014+ d_2015+ d_2016+ d_2017 +d_2018+d_2019, data = synch_synch_data_pip %>% 
+                              zlbinflation_lag3 +zlbsynch_lag1 +zlbsynch_lag2 +zlbsynch_lag3+year_2002+ year_2003+ year_2004+ year_2005+ year_2006+ year_2007+
+                               year_2008+ year_2009+ year_2010+ year_2011+ year_2012+ year_2013+ year_2014+ year_2015+ year_2016+ year_2017 +year_2018+year_2019, data = synch_synch_data_pip %>% 
                                mutate(date = as.Date(date)) %>% 
                                filter(date <= as.Date("2019-10-01")))
 
 ar.synch.synch.pip50.6 = lm(synch ~ country +draghiinflation_lag4+ draghisynch_lag1+ draghisynch_lag2+ pigsinflation_lag3+ pigsinflation_lag4+
-                              recsynch_lag1 +recsynch_lag2 +synch_lag1 +zlbinflation_lag3+ zlbsynch_lag1+ zlbsynch_lag2 +zlbsynch_lag3+d_2002+ d_2003+ d_2004+ d_2005+ d_2006+ d_2007+
-                               d_2008+ d_2009+ d_2010+ d_2011+ d_2012+ d_2013+ d_2014+ d_2015+ d_2016+ d_2017 +d_2018+d_2019+d_2020, data = synch_synch_data_pip %>% 
+                              recsynch_lag1 +recsynch_lag2 +synch_lag1 +zlbinflation_lag3+ zlbsynch_lag1+ zlbsynch_lag2 +zlbsynch_lag3+year_2002+ year_2003+ year_2004+ year_2005+ year_2006+ year_2007+
+                               year_2008+ year_2009+ year_2010+ year_2011+ year_2012+ year_2013+ year_2014+ year_2015+ year_2016+ year_2017 +year_2018+year_2019+year_2020, data = synch_synch_data_pip %>% 
                                mutate(date = as.Date(date)) %>% 
                                filter(date <= as.Date("2020-01-01")))
 
 ar.synch.synch.pip50.7 = lm(synch ~ country +draghiinflation_lag4 +draghisynch_lag1+ draghisynch_lag2+ pigsinflation_lag3+ pigsinflation_lag4 +recsynch_lag1+
-                              recsynch_lag2+ synch_lag1+ zlbinflation_lag2+ zlbinflation_lag3+ zlbsynch_lag1+ zlbsynch_lag2+ zlbsynch_lag3+d_2002+ d_2003+ d_2004+ d_2005+ d_2006+ d_2007+
-                               d_2008+ d_2009+ d_2010+ d_2011+ d_2012+ d_2013+ d_2014+ d_2015+ d_2016+ d_2017 +d_2018+d_2019+d_2020, data = synch_synch_data_pip %>% 
+                              recsynch_lag2+ synch_lag1+ zlbinflation_lag2+ zlbinflation_lag3+ zlbsynch_lag1+ zlbsynch_lag2+ zlbsynch_lag3+year_2002+ year_2003+ year_2004+ year_2005+ year_2006+ year_2007+
+                               year_2008+ year_2009+ year_2010+ year_2011+ year_2012+ year_2013+ year_2014+ year_2015+ year_2016+ year_2017 +year_2018+year_2019+year_2020, data = synch_synch_data_pip %>% 
                                mutate(date = as.Date(date)) %>% 
                                filter(date <= as.Date("2020-04-01"))) 
 
 ar.synch.synch.pip50.8 = lm(synch ~ country + draghiinflation_lag4+ draghisynch_lag1 +draghisynch_lag2+ pigsinflation_lag3 +pigsinflation_lag4 +
                               recsynch_lag1 +recsynch_lag2 +synch_lag1 +zlbinflation_lag2+ zlbinflation_lag3+ zlbsynch_lag1+ zlbsynch_lag2+
-                              zlbsynch_lag3+d_2002+ d_2003+ d_2004+ d_2005+ d_2006+ d_2007+
-                               d_2008+ d_2009+ d_2010+ d_2011+ d_2012+ d_2013+ d_2014+ d_2015+ d_2016+ d_2017 +d_2018+d_2019+d_2020, data = synch_synch_data_pip %>% 
+                              zlbsynch_lag3+year_2002+ year_2003+ year_2004+ year_2005+ year_2006+ year_2007+
+                               year_2008+ year_2009+ year_2010+ year_2011+ year_2012+ year_2013+ year_2014+ year_2015+ year_2016+ year_2017 +year_2018+year_2019+year_2020, data = synch_synch_data_pip %>% 
                                mutate(date = as.Date(date)) %>% 
                                filter(date <= as.Date("2020-07-01")))
 
