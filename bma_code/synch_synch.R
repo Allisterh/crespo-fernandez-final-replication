@@ -39,9 +39,7 @@ fe_data = fulldata %>%
   dummy_cols(select_columns = "country", remove_first_dummy = T) %>% 
   dplyr::select(-year,-country, -pigs)
 
-model_fe <-  BMS::bms(fe_data, burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random", 
-                 nmodel = 10000, mcmc = "bd", user.int = T, 
-                 fixed.reg = c(year_dummy_names, country_dummy_names), randomizeTimer = F)
+model_fe <-  fit.bms(fe_data, 1)
 
 
 coefs_fe <- stats::coef(model_fe,  std.coefs = T, order.by.pip = F)
@@ -192,9 +190,7 @@ nofe_data = fulldata %>%
 
 
 
-model_nofe <- bms(nofe_data, burn = n.burn, iter = n.iter,  g = "BRIC", mprior = "random", 
-                  nmodel = 10000, mcmc = "bd", user.int = F,  
-                  fixed.reg = year_dummy_names, randomizeTimer = F)
+model_nofe <- fit.bms(nofe_data, 2)
 
 
 coefs_nofe <- coef(model_nofe,  std.coefs = T, order.by.pip = F)[,1:3]
@@ -217,9 +213,7 @@ heredity_data = fulldata %>%
 
 heredity_data = rename.synch(heredity_data)
 
-model_heredity =  bms(heredity_data, burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random", 
-                      nmodel = 10000, mcmc = "bd.int", user.int = F, 
-                      fixed.reg = year_dummy_names, randomizeTimer = F)
+model_heredity =  fit.bms(heredity_data, 3)
 
 
 coefs_heredity <- coef(model_heredity,  std.coefs = T, order.by.pip = F)
