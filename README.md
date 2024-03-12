@@ -1,7 +1,7 @@
 # "Explaining Long-Term Bond Yields Synchronization Dynamics in Europe"  Replication Package (Crespo \& Fernandez, 2024)
 
 
-This readme file is intended to help the readers of the journal ECONOMIC MODELLING to replicate the results of the paper titled “Explaining Long-Term Bond Yields Synchronization Dynamics in Europe”, written by Jesus Crespo Cuaresma and Oscar Fernandez. All codes contain documentation which should help the researcher to replicate our results in a user-friendly format. 
+This readme file is intended to replicate the results of the paper titled “Explaining Long-Term Bond Yields Synchronization Dynamics in Europe”, written by Jesus Crespo Cuaresma and Oscar Fernandez, and published in the journal *Economic modelling* ([link to the paper](https://www.sciencedirect.com/science/article/pii/S0264999324000403)). All codes contain documentation which should help the researcher to replicate our results in a user-friendly format. 
 
 
 **IMPORTANT NOTE 1:** to fully reproduce the results with the same seed, the researcher needs to use an old version of the package BMS, which is the one we used for the paper. More specifically, the researcher needs to download in R the version 0.3.4 of the BMS package here: https://cran.r-project.org/src/contrib/Archive/BMS/. This will make sure that the seed and the corresponding results are always the same, which in our case is set to "set.seed(14091998)". The update to the version 0.3.5 made the setting of the seed a little more complicated, which is why we preferred to stick to the version 0.3.4. 
