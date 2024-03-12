@@ -5,33 +5,16 @@
 
 rm(list = ls())
 
-if (!require("pacman")) install.packages("pacman")
-pacman::p_load(DescTools, tidyr, dplyr, readxl, ggplot2, lubridate, zoo, stringr,
-               xtable, stargazer, stats, Hmisc, plm, BMS)
+# Load the necessary functions, packages, and specifications
 
-# Load the necessary functions 
-
-func.files <- list.files(path = "../funcs", pattern = "\\.R$", full.names = TRUE)
+func.files <- base::list.files(path = "./", pattern = "^~", full.names = TRUE)
 
 for (file in func.files) {
   
-  source(file)
+  base::source(file)
   
 }
 
-# Set seed and number of iterations + burnin phase
-
-set.seed(14091998)
-n.iter = 500000
-n.burn = 10000
-
-# Create PI(I)GS indicator variable to subset the forecasted measures #
-
-piigs_subset = c("spain", "portugal", "ireland", "greece", "italy")
-
-# Read the dataset, set WD #
-
-data_path = "../bma_data"
 
 # Read the data to import the synchronization variables 
 # Note that any of the two files "synch_levels.xlsx" or "synch_synch.xlsx"
@@ -315,11 +298,11 @@ cat(dir.results(without.2020(ar.country.data.nopiigs)), "\n")
 
 # Create dummy names for the BMA exercise
 
-year_dummy_names = c("d_2002","d_2003","d_2004","d_2005","d_2006","d_2007","d_2008","d_2009","d_2010","d_2011",
-                     "d_2012","d_2013","d_2014","d_2015","d_2016","d_2017","d_2018","d_2019", "d_2020")
+year_dummy_names = c("year_2002","year_2003","year_2004","year_2005","year_2006","year_2007","year_2008","year_2009","year_2010","year_2011",
+                     "year_2012","year_2013","year_2014","year_2015","year_2016","year_2017","year_2018","year_2019", "year_2020")
 
-country_dummy_names = c("d_belgium","d_finland","d_france","d_germany","d_greece","d_ireland","d_italy",
-                        "d_latvia","d_lithuania","d_netherlands","d_portugal","d_slovakia","d_slovenia","d_spain")
+country_dummy_names = c("country_belgium","country_finland","country_france","country_germany","country_greece","country_ireland","country_italy",
+                        "country_latvia","country_lithuania","country_netherlands","country_portugal","country_slovakia","country_slovenia","country_spain")
 
 # Read the data: remember, for BMA we need both synch-levels and synch-synch!
 
@@ -328,69 +311,12 @@ country_dummy_names = c("d_belgium","d_finland","d_france","d_germany","d_greece
 synch_levels_data = read_excel(file.path(data_path, "synch_levels.xlsx")) %>%
   mutate(date = as.Date(date)) %>%
   filter(date <= as.Date("2020-10-01")) %>% 
-  mutate(draghi = ifelse(date >= '2012-07-01', 1, 0), 
-         draghisynch_lag1 = draghi * synch_lag1, 
-         draghisynch_lag2 = draghi * synch_lag2, 
-         draghisynch_lag3 = draghi * synch_lag3, 
-         draghisynch_lag4 = draghi * synch_lag4, 
-         draghiuncert_lag1 = draghi * uncert_lag1,
-         draghiuncert_lag2 = draghi * uncert_lag2,
-         draghiuncert_lag3 = draghi * uncert_lag3,
-         draghiuncert_lag4 = draghi * uncert_lag4, 
-         draghigdp_lag1 = draghi * gdp_lag1, 
-         draghigdp_lag2 = draghi * gdp_lag2,
-         draghigdp_lag3 = draghi * gdp_lag3,
-         draghigdp_lag4 = draghi * gdp_lag4, 
-         draghibop_lag1 = draghi * bop_lag1, 
-         draghibop_lag2 = draghi * bop_lag2,
-         draghibop_lag3 = draghi * bop_lag3,
-         draghibop_lag4 = draghi * bop_lag4, 
-         draghidebttogdp_lag1 = draghi * debttogdp_lag1, 
-         draghidebttogdp_lag2 = draghi * debttogdp_lag2, 
-         draghidebttogdp_lag3 = draghi * debttogdp_lag3, 
-         draghidebttogdp_lag4 = draghi * debttogdp_lag4, 
-         draghiinflation_lag1 = draghi * inflation_lag1, 
-         draghiinflation_lag2 = draghi * inflation_lag2,
-         draghiinflation_lag3 = draghi * inflation_lag3,
-         draghiinflation_lag4 = draghi * inflation_lag4) 
+  add.draghi.synch()
 
 synch_levels_data = synch_levels_data %>%
   select(-uncert,-bop,-debttogdp,-gdp,-euribor,-inflation) %>%
-
-  mutate(d_belgium = ifelse(country == "belgium", 1 , 0),
-         d_finland = ifelse(country == "finland", 1 , 0),
-         d_france = ifelse(country == "france", 1 , 0),
-         d_germany = ifelse(country == "germany", 1 , 0),
-         d_greece = ifelse(country == "greece", 1 , 0),
-         d_ireland = ifelse(country == "ireland", 1 , 0),
-         d_italy = ifelse(country == "italy", 1 , 0),
-         d_latvia = ifelse(country == "latvia", 1 , 0),
-         d_lithuania = ifelse(country == "lithuania", 1, 0),
-         d_netherlands = ifelse(country == "netherlands", 1 , 0),
-         d_portugal = ifelse(country == "portugal", 1 , 0),
-         d_slovakia = ifelse(country == "slovakia", 1 , 0),
-         d_slovenia = ifelse(country == "slovenia", 1 , 0),
-         d_spain = ifelse(country == "spain", 1 , 0)) %>%
-
-  mutate(d_2002 = ifelse(year == 2002, 1 , 0),
-         d_2003 = ifelse(year == 2003, 1 , 0),
-         d_2004 = ifelse(year == 2004, 1 , 0),
-         d_2005 = ifelse(year == 2005, 1 , 0),
-         d_2006 = ifelse(year == 2006, 1 , 0),
-         d_2007 = ifelse(year == 2007, 1 , 0),
-         d_2008 = ifelse(year == 2008, 1 , 0),
-         d_2009 = ifelse(year == 2009, 1 , 0),
-         d_2010 = ifelse(year == 2010, 1 , 0),
-         d_2011 = ifelse(year == 2011, 1 , 0),
-         d_2012 = ifelse(year == 2012, 1 , 0),
-         d_2013 = ifelse(year == 2013, 1 , 0),
-         d_2014 = ifelse(year == 2014, 1 , 0),
-         d_2015 = ifelse(year == 2015, 1 , 0),
-         d_2016 = ifelse(year == 2016, 1 , 0),
-         d_2017 = ifelse(year == 2017, 1 , 0),
-         d_2018 = ifelse(year == 2018, 1 , 0),
-         d_2019 = ifelse(year == 2019, 1 , 0),
-         d_2020 = ifelse(year == 2020, 1 , 0)) %>%
+  dummy_cols(select_columns = "year", remove_first_dummy = T) %>%
+  dummy_cols(select_columns = "country", remove_first_dummy = T) %>% 
   select(-year, -pigs)
 
 
@@ -399,69 +325,12 @@ synch_levels_data = synch_levels_data %>%
 synch_synch_data = read_excel(file.path(data_path, "synch_synch.xlsx")) %>%
   mutate(date = as.Date(date)) %>%
   filter(date <= as.Date("2020-10-01")) %>% 
-  mutate(draghi = ifelse(date >= '2012-07-01', 1, 0), 
-         draghisynch_lag1 = draghi * synch_lag1, 
-         draghisynch_lag2 = draghi * synch_lag2, 
-         draghisynch_lag3 = draghi * synch_lag3, 
-         draghisynch_lag4 = draghi * synch_lag4, 
-         draghiuncert_lag1 = draghi * uncert_lag1,
-         draghiuncert_lag2 = draghi * uncert_lag2,
-         draghiuncert_lag3 = draghi * uncert_lag3,
-         draghiuncert_lag4 = draghi * uncert_lag4, 
-         draghigdp_lag1 = draghi * gdp_lag1, 
-         draghigdp_lag2 = draghi * gdp_lag2,
-         draghigdp_lag3 = draghi * gdp_lag3,
-         draghigdp_lag4 = draghi * gdp_lag4, 
-         draghibop_lag1 = draghi * bop_lag1, 
-         draghibop_lag2 = draghi * bop_lag2,
-         draghibop_lag3 = draghi * bop_lag3,
-         draghibop_lag4 = draghi * bop_lag4, 
-         draghidebttogdp_lag1 = draghi * debttogdp_lag1, 
-         draghidebttogdp_lag2 = draghi * debttogdp_lag2, 
-         draghidebttogdp_lag3 = draghi * debttogdp_lag3, 
-         draghidebttogdp_lag4 = draghi * debttogdp_lag4, 
-         draghiinflation_lag1 = draghi * inflation_lag1, 
-         draghiinflation_lag2 = draghi * inflation_lag2,
-         draghiinflation_lag3 = draghi * inflation_lag3,
-         draghiinflation_lag4 = draghi * inflation_lag4) 
+  add.draghi.synch()
 
 synch_synch_data = synch_synch_data %>%
   select(-uncert,-bop,-debttogdp,-gdp,-euribor,-inflation) %>%
-
-  mutate(d_belgium = ifelse(country == "belgium", 1 , 0),
-         d_finland = ifelse(country == "finland", 1 , 0),
-         d_france = ifelse(country == "france", 1 , 0),
-         d_germany = ifelse(country == "germany", 1 , 0),
-         d_greece = ifelse(country == "greece", 1 , 0),
-         d_ireland = ifelse(country == "ireland", 1 , 0),
-         d_italy = ifelse(country == "italy", 1 , 0),
-         d_latvia = ifelse(country == "latvia", 1 , 0),
-         d_lithuania = ifelse(country == "lithuania", 1, 0),
-         d_netherlands = ifelse(country == "netherlands", 1 , 0),
-         d_portugal = ifelse(country == "portugal", 1 , 0),
-         d_slovakia = ifelse(country == "slovakia", 1 , 0),
-         d_slovenia = ifelse(country == "slovenia", 1 , 0),
-         d_spain = ifelse(country == "spain", 1 , 0)) %>%
-
-  mutate(d_2002 = ifelse(year == 2002, 1 , 0),
-         d_2003 = ifelse(year == 2003, 1 , 0),
-         d_2004 = ifelse(year == 2004, 1 , 0),
-         d_2005 = ifelse(year == 2005, 1 , 0),
-         d_2006 = ifelse(year == 2006, 1 , 0),
-         d_2007 = ifelse(year == 2007, 1 , 0),
-         d_2008 = ifelse(year == 2008, 1 , 0),
-         d_2009 = ifelse(year == 2009, 1 , 0),
-         d_2010 = ifelse(year == 2010, 1 , 0),
-         d_2011 = ifelse(year == 2011, 1 , 0),
-         d_2012 = ifelse(year == 2012, 1 , 0),
-         d_2013 = ifelse(year == 2013, 1 , 0),
-         d_2014 = ifelse(year == 2014, 1 , 0),
-         d_2015 = ifelse(year == 2015, 1 , 0),
-         d_2016 = ifelse(year == 2016, 1 , 0),
-         d_2017 = ifelse(year == 2017, 1 , 0),
-         d_2018 = ifelse(year == 2018, 1 , 0),
-         d_2019 = ifelse(year == 2019, 1 , 0),
-         d_2020 = ifelse(year == 2020, 1 , 0)) %>%
+  dummy_cols(select_columns = "year", remove_first_dummy = T) %>%
+  dummy_cols(select_columns = "country", remove_first_dummy = T) %>% 
   select(-year, -pigs)
 
 
@@ -494,40 +363,40 @@ bma.synch.synch.forecast.data = complete(bma.synch.synch.forecast.data, country,
 bma.model.synch.levels.1 = bms(synch_levels_data %>%
                                  mutate(date = as.Date(date)) %>%
                                  filter(date <= as.Date("2018-10-01")) %>%
-                                 select(-date, -country, -d_2019, -d_2020),
-                               burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random",
+                                 select(-date, -country, -year_2019, -year_2020),
+                               burn = n.burn.fcast, iter = n.iter.fcast, g = "BRIC", mprior = "random",
                                nmodel = 10000, mcmc = "bd", user.int = F, randomizeTimer = F,
                                fixed.reg = c(year_dummy_names[-c(18,19)], country_dummy_names))
 
 bma.model.synch.levels.2 = bms(synch_levels_data %>%
                                  mutate(date = as.Date(date)) %>%
                                  filter(date <= as.Date("2019-01-01")) %>%
-                                 select(-date, -country, -d_2020),
-                               burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random",
+                                 select(-date, -country, -year_2020),
+                               burn = n.burn.fcast, iter = n.iter.fcast, g = "BRIC", mprior = "random",
                                nmodel = 10000, mcmc = "bd", user.int = F, randomizeTimer = F,
                                fixed.reg = c(year_dummy_names[-c(19)], country_dummy_names))
 
 bma.model.synch.levels.3 = bms(synch_levels_data %>%
                                  mutate(date = as.Date(date)) %>%
                                  filter(date <= as.Date("2019-04-01")) %>%
-                                 select(-date, -country, -d_2020),
-                               burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random",
+                                 select(-date, -country, -year_2020),
+                               burn = n.burn.fcast, iter = n.iter.fcast, g = "BRIC", mprior = "random",
                                nmodel = 10000, mcmc = "bd", user.int = F, randomizeTimer = F,
                                fixed.reg = c(year_dummy_names[-c(19)], country_dummy_names))
 
 bma.model.synch.levels.4 = bms(synch_levels_data %>%
                                  mutate(date = as.Date(date)) %>%
                                  filter(date <= as.Date("2019-07-01")) %>%
-                                 select(-date, -country, -d_2020),
-                               burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random",
+                                 select(-date, -country, -year_2020),
+                               burn = n.burn.fcast, iter = n.iter.fcast, g = "BRIC", mprior = "random",
                                nmodel = 10000, mcmc = "bd", user.int = F, randomizeTimer = F,
                                fixed.reg = c(year_dummy_names[-c(19)], country_dummy_names))
 
 bma.model.synch.levels.5 = bms(synch_levels_data %>%
                                  mutate(date = as.Date(date)) %>%
                                  filter(date <= as.Date("2019-10-01")) %>%
-                                 select(-date, -country, -d_2020),
-                               burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random",
+                                 select(-date, -country, -year_2020),
+                               burn = n.burn.fcast, iter = n.iter.fcast, g = "BRIC", mprior = "random",
                                nmodel = 10000, mcmc = "bd", user.int = F, randomizeTimer = F,
                                fixed.reg = c(year_dummy_names[-c(19)], country_dummy_names))
 
@@ -535,7 +404,7 @@ bma.model.synch.levels.6 = bms(synch_levels_data %>%
                                  mutate(date = as.Date(date)) %>%
                                  filter(date <= as.Date("2020-01-01")) %>%
                                  select(-date, -country),
-                               burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random",
+                               burn = n.burn.fcast, iter = n.iter.fcast, g = "BRIC", mprior = "random",
                                nmodel = 10000, mcmc = "bd", user.int = F, randomizeTimer = F,
                                fixed.reg = c(year_dummy_names, country_dummy_names))
 
@@ -543,7 +412,7 @@ bma.model.synch.levels.7 = bms(synch_levels_data %>%
                                  mutate(date = as.Date(date)) %>%
                                  filter(date <= as.Date("2020-04-01")) %>%
                                  select(-date, -country),
-                               burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random",
+                               burn = n.burn.fcast, iter = n.iter.fcast, g = "BRIC", mprior = "random",
                                nmodel = 10000, mcmc = "bd", user.int = F, randomizeTimer = F,
                                fixed.reg = c(year_dummy_names, country_dummy_names))
 
@@ -551,7 +420,7 @@ bma.model.synch.levels.8 = bms(synch_levels_data %>%
                                  mutate(date = as.Date(date)) %>%
                                  filter(date <= as.Date("2020-07-01")) %>%
                                  select(-date, -country),
-                               burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random",
+                               burn = n.burn.fcast, iter = n.iter.fcast, g = "BRIC", mprior = "random",
                                nmodel = 10000, mcmc = "bd", user.int = F, randomizeTimer = F,
                                fixed.reg = c(year_dummy_names, country_dummy_names))
 
@@ -563,40 +432,40 @@ bma.model.synch.levels.8 = bms(synch_levels_data %>%
 bma.model.synch.synch.1 = bms(synch_synch_data %>%
                                  mutate(date = as.Date(date)) %>%
                                  filter(date <= as.Date("2018-10-01")) %>%
-                                 select(-date, -country, -d_2019,-d_2020),
-                               burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random",
+                                 select(-date, -country, -year_2019,-year_2020),
+                               burn = n.burn.fcast, iter = n.iter.fcast, g = "BRIC", mprior = "random",
                                nmodel = 10000, mcmc = "bd", user.int = F, randomizeTimer = F,
                               fixed.reg = c(year_dummy_names[-c(18,19)], country_dummy_names))
 
 bma.model.synch.synch.2 = bms(synch_synch_data %>%
                                  mutate(date = as.Date(date)) %>%
                                  filter(date <= as.Date("2019-01-01")) %>%
-                                select(-date, -country, -d_2020),
-                              burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random",
+                                select(-date, -country, -year_2020),
+                              burn = n.burn.fcast, iter = n.iter.fcast, g = "BRIC", mprior = "random",
                               nmodel = 10000, mcmc = "bd", user.int = F, randomizeTimer = F,
                               fixed.reg = c(year_dummy_names[-c(19)], country_dummy_names))
 
 bma.model.synch.synch.3 = bms(synch_synch_data %>%
                                  mutate(date = as.Date(date)) %>%
                                  filter(date <= as.Date("2019-04-01")) %>%
-                                select(-date, -country, -d_2020),
-                              burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random",
+                                select(-date, -country, -year_2020),
+                              burn = n.burn.fcast, iter = n.iter.fcast, g = "BRIC", mprior = "random",
                               nmodel = 10000, mcmc = "bd", user.int = F, randomizeTimer = F,
                               fixed.reg = c(year_dummy_names[-c(19)], country_dummy_names))
 
 bma.model.synch.synch.4 = bms(synch_synch_data %>%
                                  mutate(date = as.Date(date)) %>%
                                  filter(date <= as.Date("2019-07-01")) %>%
-                                select(-date, -country, -d_2020),
-                              burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random",
+                                select(-date, -country, -year_2020),
+                              burn = n.burn.fcast, iter = n.iter.fcast, g = "BRIC", mprior = "random",
                               nmodel = 10000, mcmc = "bd", user.int = F, randomizeTimer = F,
                               fixed.reg = c(year_dummy_names[-c(19)], country_dummy_names))
 
 bma.model.synch.synch.5 = bms(synch_synch_data %>%
                                  mutate(date = as.Date(date)) %>%
                                  filter(date <= as.Date("2019-10-01")) %>%
-                                select(-date, -country, -d_2020),
-                              burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random",
+                                select(-date, -country, -year_2020),
+                              burn = n.burn.fcast, iter = n.iter.fcast, g = "BRIC", mprior = "random",
                               nmodel = 10000, mcmc = "bd", user.int = F, randomizeTimer = F,
                               fixed.reg = c(year_dummy_names[-c(19)], country_dummy_names))
 
@@ -604,7 +473,7 @@ bma.model.synch.synch.6 = bms(synch_synch_data %>%
                                  mutate(date = as.Date(date)) %>%
                                  filter(date <= as.Date("2020-01-01")) %>%
                                 select(-date, -country),
-                              burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random",
+                              burn = n.burn.fcast, iter = n.iter.fcast, g = "BRIC", mprior = "random",
                               nmodel = 10000, mcmc = "bd", user.int = F, randomizeTimer = F,
                               fixed.reg = c(year_dummy_names, country_dummy_names))
 
@@ -612,7 +481,7 @@ bma.model.synch.synch.7 = bms(synch_synch_data %>%
                                  mutate(date = as.Date(date)) %>%
                                  filter(date <= as.Date("2020-04-01")) %>%
                                 select(-date, -country),
-                              burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random",
+                              burn = n.burn.fcast, iter = n.iter.fcast, g = "BRIC", mprior = "random",
                               nmodel = 10000, mcmc = "bd", user.int = F, randomizeTimer = F,
                               fixed.reg = c(year_dummy_names, country_dummy_names))
 
@@ -620,7 +489,7 @@ bma.model.synch.synch.8 = bms(synch_synch_data %>%
                                  mutate(date = as.Date(date)) %>%
                                  filter(date <= as.Date("2020-07-01")) %>%
                                 select(-date, -country),
-                              burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random",
+                              burn = n.burn.fcast, iter = n.iter.fcast, g = "BRIC", mprior = "random",
                               nmodel = 10000, mcmc = "bd", user.int = F, randomizeTimer = F,
                               fixed.reg = c(year_dummy_names, country_dummy_names))
 
