@@ -30,11 +30,19 @@ readxl::read_xls(file.path(data_path, "yields_data.xls"), range = "A16:G287") %>
                                            "Ireland" = "yellow")) +
   ggplot2::theme_light() +
   labs(x = "", y = "Spread against German yield (in %)") + 
-  guides(fill=guide_legend(ncol=3)) +
   theme(legend.position = c(0.3, 0.7), 
         legend.background = element_blank(),
-        legend.box.background = element_rect(colour = "black"))
+        legend.box.background = element_rect(colour = "black")) +
+  theme(text=element_text(family="LM Roman 10"))
 
+# Produce Figure 3 in the paper (originally in Matlab)
+
+readxl::read_xlsx(file.path(data_path, "s_t.xlsx")) %>% 
+  ggplot2::ggplot(aes(x = date, y = synch)) + 
+  ggplot2::geom_line(color = "darkblue") +
+  ggplot2::labs(x = "", y = "Cross-country Standard deviation of \n long-term government bond yields") +
+  ggplot2::theme_light() + 
+  theme(text=element_text(family="LM Roman 10"))
 
 # Produce state-dependent synchronization tests (Table A.3 in the paper)
 
