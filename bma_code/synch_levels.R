@@ -324,9 +324,7 @@ nofe_data = fulldata %>%
 
 
 
-model_nofe <- BMS::bms(nofe_data, burn = n.burn, iter = n.iter,  g = "BRIC", mprior = "random", 
-                  nmodel = 10000, mcmc = "bd", user.int = F,  
-                  fixed.reg = year_dummy_names, randomizeTimer = F)
+model_nofe <- fit.bms(nofe_data, 2)
 
 
 coefs_nofe <- stats::coef(model_nofe,  std.coefs = T, order.by.pip = F)[,1:3]
@@ -349,9 +347,7 @@ heredity_data = fulldata %>%
 
 heredity_data = rename.synch(heredity_data)
 
-model_heredity =  BMS::bms(heredity_data, burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random", 
-                      nmodel = 10000, mcmc = "bd.int", user.int = F, 
-                      fixed.reg = year_dummy_names, randomizeTimer = F)
+model_heredity =  fit.bms(heredity_data, 3)
 
 
 coefs_heredity <- stats::coef(model_heredity,  std.coefs = T, order.by.pip = F)
