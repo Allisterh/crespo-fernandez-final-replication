@@ -9,87 +9,87 @@ pacman::p_load(readxl, dplyr, tidyr, BMS, Cairo, reshape2, ggplot2, writexl,
 
 # Load the necessary functions 
 
-func.files <- list.files(path = "../funcs", pattern = "\\.R$", full.names = TRUE)
+func.files <- base::list.files(path = "../funcs", pattern = "\\.R$", full.names = TRUE)
 
 for (file in func.files) {
   
-  source(file)
+  base::source(file)
   
 }
 
 
 # Produce state-dependent synchronization tests (Table A.3 in the paper)
 
-synch.data = read_excel("../bma_data/synch_levels.xlsx") %>% 
-  select(date, country, synch, rec, zlb) %>% 
-  mutate(draghi = ifelse(date >= '2012-07-01', 1, 0))
+synch.data = readxl::read_excel("../bma_data/synch_levels.xlsx") %>% 
+  dplyr::select(date, country, synch, rec, zlb) %>% 
+  dplyr::mutate(draghi = dplyr::if_else(date >= '2012-07-01', 1, 0))
 
 # Get unique country list 
 
-country.list = sort(unique(synch.data$country))
+country.list = base::sort(base::unique(synch.data$country))
 
 # Create three arrays for the results (recession, ZLB, Draghi)
 
-rec.results = as.data.frame(cbind(country.list, 
-                                  array(0, c(length(country.list),1))), row.names = F) %>% 
-  rename(Country = country.list, Pval = V2)
+rec.results = base::as.data.frame(base::cbind(country.list, 
+                                  base::array(0, c(length(country.list),1))), row.names = F) %>% 
+  dplyr::rename(Country = country.list, Pval = V2)
 
 # Note: for ZLB and Draghi is country.list-2 because Latvia and Lithuania was always either in ZLB or always in Draghi!
 
 lv.lt.country.list = country.list[! country.list %in% c('latvia', 'lithuania')]
 
-zlb.results = as.data.frame(cbind(lv.lt.country.list, 
-                                  array(0, c(length(lv.lt.country.list),1))), row.names = F) %>% 
-  rename(Country = lv.lt.country.list, Pval = V2)
+zlb.results = base::as.data.frame(base::cbind(lv.lt.country.list, 
+                                  base::array(0, c(base::length(lv.lt.country.list),1))), row.names = F) %>% 
+  dplyr::rename(Country = lv.lt.country.list, Pval = V2)
 
-draghi.results = as.data.frame(cbind(lv.lt.country.list, 
-                                     array(0, c(length(lv.lt.country.list),1))), row.names = F) %>% 
-  rename(Country = lv.lt.country.list, Pval = V2)
+draghi.results = as.data.frame(base::cbind(lv.lt.country.list, 
+                                     base::array(0, c(base::length(lv.lt.country.list),1))), row.names = F) %>% 
+  dplyr::rename(Country = lv.lt.country.list, Pval = V2)
 
 
 # T-test for recession variable
 
 for (jj in 1:length(country.list)) {
   
-  rec.results[jj,2] = round(my.ttest(country.list[jj], rec)$p.value,5)
+  rec.results[jj,2] = base::round(my.ttest(country.list[jj], rec)$p.value,5)
   
   
 }
 
 rec.results = rec.results %>% 
-  mutate(Pval = as.numeric(Pval), 
-         Significant = ifelse(Pval < 0.05, "Yes", "No"), 
-         Country = str_to_title(Country))
+  dplyr::mutate(Pval = base::as.numeric(Pval), 
+         Significant = dplyr::if_else(Pval < 0.05, "Yes", "No"), 
+         Country = stringr::str_to_title(Country))
 
 
 # T-test for ZLB variable 
 
 for (jj in 1:length(lv.lt.country.list)) {
   
-  zlb.results[jj,2] = round(my.ttest(lv.lt.country.list[jj], zlb)$p.value,5)
+  zlb.results[jj,2] = base::round(my.ttest(lv.lt.country.list[jj], zlb)$p.value,5)
   
   
 }
 
 zlb.results = zlb.results %>% 
-  mutate(Pval = as.numeric(Pval), 
-         Significant = ifelse(Pval < 0.05, "Yes", "No"), 
-         Country = str_to_title(Country))
+  dplyr::mutate(Pval = base::as.numeric(Pval), 
+         Significant = dplyr::if_else(Pval < 0.05, "Yes", "No"), 
+         Country = stringr::str_to_title(Country))
 
 
 # T-test for Draghi variable 
 
 for (jj in 1:length(lv.lt.country.list)) {
   
-  draghi.results[jj,2] = round(my.ttest(lv.lt.country.list[jj], draghi)$p.value,5)
+  draghi.results[jj,2] = base::round(my.ttest(lv.lt.country.list[jj], draghi)$p.value,5)
   
   
 }
 
 draghi.results = draghi.results %>% 
-  mutate(Pval = as.numeric(Pval), 
-         Significant = ifelse(Pval < 0.05, "Yes", "No"), 
-         Country = str_to_title(Country))
+  dplyr::mutate(Pval = base::as.numeric(Pval), 
+         Significant = dplyr::if_else(Pval < 0.05, "Yes", "No"), 
+         Country = stringr::str_to_title(Country))
 
 # Print the tables (Table A.3 in the paper)
 
@@ -103,7 +103,7 @@ rm(list = setdiff(ls(), lsf.str()))
 
 # Set seed and number of iterations + burnin phase
 
-set.seed(14091998)
+base::set.seed(14091998)
 n.burn = 10000
 n.iter = 1e7
 
@@ -111,13 +111,13 @@ n.iter = 1e7
 
 data_path = "../bma_data"
 
-fulldata = read_excel(file.path(data_path, "synch_levels.xlsx"))
+fulldata = readxl::read_excel(base::file.path(data_path, "synch_levels.xlsx"))
 
 
 # Reproduce synchronization figure in the paper (Figure 3 in the paper)
 
 fulldata %>% 
-  mutate(country = case_when(
+  dplyr::mutate(country = dplyr::case_when(
     country == "austria" ~ "Austria", 
     country == "belgium" ~ "Belgium", 
     country == "finland" ~ "Finland", 
@@ -135,18 +135,18 @@ fulldata %>%
     country == "spain" ~ "Spain",
     TRUE~country
   )) %>% 
-  ggplot(aes(x = date, y = synch)) + 
-  geom_line() + 
-  geom_hline(yintercept=0, linetype="dashed", color = "red") + 
-  facet_wrap(~country, scales = "free", nrow = 3) +
-  labs(x = "Date", y = "Long-term yield synchronization rates")
+  ggplot2::ggplot(aes(x = date, y = synch)) + 
+  ggplot2::geom_line() + 
+  ggplot2::geom_hline(yintercept=0, linetype="dashed", color = "red") + 
+  ggplot2::facet_wrap(~country, scales = "free", nrow = 3) +
+  ggplot2::labs(x = "Date", y = "Long-term yield synchronization rates")
 
 
 # Data availability by country (Table A.1 in the paper)
 
 fulldata %>% 
-  select(country, date) %>% 
-  mutate(country = case_when(
+  dplyr::select(country, date) %>% 
+  dplyr::mutate(country = dplyr::case_when(
   country == "austria" ~ "Austria", 
   country == "belgium" ~ "Belgium", 
   country == "finland" ~ "Finland", 
@@ -163,8 +163,9 @@ fulldata %>%
   country == "slovenia" ~ "Slovenia", 
   country == "spain" ~ "Spain",
   TRUE~country)) %>% 
-  group_by(country) %>% 
-  summarise(`Start Date` = as.Date(min(date)), `End Date` = as.Date(max(date))) 
+  dplyr::group_by(country) %>% 
+  dplyr::summarise(`Start Date` = as.Date(min(date)), `End Date` = as.Date(max(date))) %>% 
+  dplyr::ungroup()
 
 
 # Summary statistics by country (Table A.2 in the paper, select specific country to display)
@@ -172,7 +173,7 @@ fulldata %>%
 my_func = function(my_country) {  
   
   sum.stats = fulldata %>% 
-  filter(country == as.name(my_country)) %>% 
+  dplyr::filter(country == base::as.name(my_country)) %>% 
   summarize(round(mean(synch), 3), round(sd(synch), 3), round(min(synch), 3), round(max(synch), 3),
             round(mean(uncert), 3), round(sd(uncert), 3), round(min(uncert), 3), round(max(uncert), 3), 
             round(mean(gdp), 3), round(sd(gdp), 3), round(min(gdp), 3), round(max(gdp), 3), 
@@ -180,12 +181,12 @@ my_func = function(my_country) {
             round(mean(inflation), 3), round(sd(inflation), 3), round(min(inflation), 3), round(max(inflation), 3), 
             round(mean(rec), 3), round(sd(rec), 3), round(min(rec), 3), round(max(rec), 3))
   
-    print(sum.stats[1:4])
-    print(sum.stats[5:8])
-    print(sum.stats[9:12])
-    print(sum.stats[13:16])
-    print(sum.stats[17:20])
-    print(sum.stats[21:24])
+    base::print(sum.stats[1:4])
+    base::print(sum.stats[5:8])
+    base::print(sum.stats[9:12])
+    base::print(sum.stats[13:16])
+    base::print(sum.stats[17:20])
+    base::print(sum.stats[21:24])
   
 }
 
@@ -199,7 +200,7 @@ all_countries = c("austria", "belgium", "finland",
 
 for (mycountry in all_countries) {
   
-  print(mycountry)
+  base::print(mycountry)
   my_func(mycountry)
   
   
@@ -209,7 +210,7 @@ for (mycountry in all_countries) {
 # Add Draghi dummy + interactions
 
 fulldata = fulldata %>% 
-  mutate(draghi = ifelse(date >= '2012-07-01', 1, 0), 
+  dplyr::mutate(draghi = dplyr::if_else(date >= '2012-07-01', 1, 0), 
          draghisynch_lag1 = draghi * synch_lag1, 
          draghisynch_lag2 = draghi * synch_lag2, 
          draghisynch_lag3 = draghi * synch_lag3, 
@@ -290,51 +291,51 @@ country_dummy_names = c("d_belgium",
 
 
 fe_data = fulldata %>% 
-  select(-date,-uncert,-bop,-debttogdp,-gdp,-euribor,-inflation) %>% 
+  dplyr::select(-date,-uncert,-bop,-debttogdp,-gdp,-euribor,-inflation) %>% 
   
-  mutate(d_belgium = ifelse(country == "belgium", 1 , 0),
-         d_finland = ifelse(country == "finland", 1 , 0),
-         d_france = ifelse(country == "france", 1 , 0),
-         d_germany = ifelse(country == "germany", 1 , 0),
-         d_greece = ifelse(country == "greece", 1 , 0),
-         d_ireland = ifelse(country == "ireland", 1 , 0),
-         d_italy = ifelse(country == "italy", 1 , 0),
-         d_latvia = ifelse(country == "latvia", 1 , 0),
-         d_lithuania = ifelse(country == "lithuania", 1, 0),
-         d_netherlands = ifelse(country == "netherlands", 1 , 0),
-         d_portugal = ifelse(country == "portugal", 1 , 0),
-         d_slovakia = ifelse(country == "slovakia", 1 , 0),
-         d_slovenia = ifelse(country == "slovenia", 1 , 0),
-         d_spain = ifelse(country == "spain", 1 , 0)) %>%
+  dplyr::mutate(d_belgium = dplyr::if_else(country == "belgium", 1 , 0),
+         d_finland = dplyr::if_else(country == "finland", 1 , 0),
+         d_france = dplyr::if_else(country == "france", 1 , 0),
+         d_germany = dplyr::if_else(country == "germany", 1 , 0),
+         d_greece = dplyr::if_else(country == "greece", 1 , 0),
+         d_ireland = dplyr::if_else(country == "ireland", 1 , 0),
+         d_italy = dplyr::if_else(country == "italy", 1 , 0),
+         d_latvia = dplyr::if_else(country == "latvia", 1 , 0),
+         d_lithuania = dplyr::if_else(country == "lithuania", 1, 0),
+         d_netherlands = dplyr::if_else(country == "netherlands", 1 , 0),
+         d_portugal = dplyr::if_else(country == "portugal", 1 , 0),
+         d_slovakia = dplyr::if_else(country == "slovakia", 1 , 0),
+         d_slovenia = dplyr::if_else(country == "slovenia", 1 , 0),
+         d_spain = dplyr::if_else(country == "spain", 1 , 0)) %>%
 
-  mutate(d_2002 = ifelse(year == 2002, 1 , 0),
-         d_2003 = ifelse(year == 2003, 1 , 0),
-         d_2004 = ifelse(year == 2004, 1 , 0),
-         d_2005 = ifelse(year == 2005, 1 , 0),
-         d_2006 = ifelse(year == 2006, 1 , 0),
-         d_2007 = ifelse(year == 2007, 1 , 0),
-         d_2008 = ifelse(year == 2008, 1 , 0),
-         d_2009 = ifelse(year == 2009, 1 , 0),
-         d_2010 = ifelse(year == 2010, 1 , 0),
-         d_2011 = ifelse(year == 2011, 1 , 0),
-         d_2012 = ifelse(year == 2012, 1 , 0),
-         d_2013 = ifelse(year == 2013, 1 , 0),
-         d_2014 = ifelse(year == 2014, 1 , 0),
-         d_2015 = ifelse(year == 2015, 1 , 0),
-         d_2016 = ifelse(year == 2016, 1 , 0),
-         d_2017 = ifelse(year == 2017, 1 , 0),
-         d_2018 = ifelse(year == 2018, 1 , 0),
-         d_2019 = ifelse(year == 2019, 1 , 0),
-         d_2020 = ifelse(year == 2020, 1 , 0),
-         d_2021 = ifelse(year == 2021, 1 , 0)) %>% 
-  select(-year,-country, -pigs)
+  mutate(d_2002 = dplyr::if_else(year == 2002, 1 , 0),
+         d_2003 = dplyr::if_else(year == 2003, 1 , 0),
+         d_2004 = dplyr::if_else(year == 2004, 1 , 0),
+         d_2005 = dplyr::if_else(year == 2005, 1 , 0),
+         d_2006 = dplyr::if_else(year == 2006, 1 , 0),
+         d_2007 = dplyr::if_else(year == 2007, 1 , 0),
+         d_2008 = dplyr::if_else(year == 2008, 1 , 0),
+         d_2009 = dplyr::if_else(year == 2009, 1 , 0),
+         d_2010 = dplyr::if_else(year == 2010, 1 , 0),
+         d_2011 = dplyr::if_else(year == 2011, 1 , 0),
+         d_2012 = dplyr::if_else(year == 2012, 1 , 0),
+         d_2013 = dplyr::if_else(year == 2013, 1 , 0),
+         d_2014 = dplyr::if_else(year == 2014, 1 , 0),
+         d_2015 = dplyr::if_else(year == 2015, 1 , 0),
+         d_2016 = dplyr::if_else(year == 2016, 1 , 0),
+         d_2017 = dplyr::if_else(year == 2017, 1 , 0),
+         d_2018 = dplyr::if_else(year == 2018, 1 , 0),
+         d_2019 = dplyr::if_else(year == 2019, 1 , 0),
+         d_2020 = dplyr::if_else(year == 2020, 1 , 0),
+         d_2021 = dplyr::if_else(year == 2021, 1 , 0)) %>% 
+  dplyr::select(-year,-country, -pigs)
 
-model_fe <-  bms(fe_data, burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random", 
+model_fe <- BMS::bms(fe_data, burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random", 
                  nmodel = 10000, mcmc = "bd", user.int = F, 
                  fixed.reg = c(year_dummy_names, country_dummy_names), randomizeTimer = F)
 
 
-coefs_fe <- coef(model_fe,  std.coefs = T, order.by.pip = F)
+coefs_fe <- stats::coef(model_fe,  std.coefs = T, order.by.pip = F)
 
 # Do not select the Fixed Effects results (year & country) #
 
@@ -350,7 +351,7 @@ jointness.yqm = jointness.score(model_fe, method = "YQM")
 
 # Reorganize the columns of the matrix #
 
-col.order = rownames(coef(model_fe, order.by.pip = F))
+col.order = base::rownames(stats::coef(model_fe, order.by.pip = F))
 
 jointness.dw2 = jointness.dw2[col.order,col.order]
 jointness.ls2 = jointness.ls2[col.order,col.order]
@@ -362,33 +363,33 @@ jointness.yqm = jointness.yqm[col.order,col.order]
 
 # Melt the jointness measures to discover the maximum values #
 
-jointness.dw2 = melt(jointness.dw2)
-jointness.ls2 = melt(jointness.ls2)
-jointness.yqm = melt(jointness.yqm)
+jointness.dw2 = reshape2::melt(jointness.dw2)
+jointness.ls2 = reshape2::melt(jointness.ls2)
+jointness.yqm = reshape2::melt(jointness.yqm)
 
 
 # Convert to numeric to turn NaN and . into NA values # 
 
 jointness.dw2 = jointness.dw2 %>% 
-  mutate(value = as.numeric(value))
+  dplyr::mutate(value = as.numeric(value))
 
 jointness.ls2 = jointness.ls2 %>% 
-  mutate(value = as.numeric(value))
+  dplyr::mutate(value = as.numeric(value))
 
 jointness.yqm = jointness.yqm %>% 
-  mutate(value = as.numeric(value))
+  dplyr::mutate(value = as.numeric(value))
 
 # Get the maximum values in order to select the variables
 # that present the higher jointness
 
 max.jointness.dw2 = jointness.dw2 %>% 
-  filter(value == max(value, na.rm = T))
+  dplyr::filter(value == base::max(value, na.rm = T))
 
 max.jointness.ls2 = jointness.ls2 %>% 
-  filter(value == max(value, na.rm = T))
+  dplyr::filter(value == base::max(value, na.rm = T))
 
 max.jointness.yqm = jointness.yqm %>% 
-  filter(value == max(value, na.rm = T))
+  dplyr::filter(value == base::max(value, na.rm = T))
 
 
 # In order to get unique values, consider creating a pair variable
@@ -396,24 +397,24 @@ max.jointness.yqm = jointness.yqm %>%
 # Also, do not display the year nor country fixed effects variables
 
 max.jointness.dw2 = max.jointness.dw2 %>% 
-  mutate(pair = paste(pmin(as.character(Var1), as.character(Var2)), 
+  dplyr::mutate(pair = base::paste(pmin(as.character(Var1), as.character(Var2)), 
                       pmax(as.character(Var1), as.character(Var2)), sep = '-')) %>% 
-  distinct(pair) %>% 
-  filter(!grepl('d_',pair))
+  dplyr::distinct(pair) %>% 
+  dplyr::filter(!grepl('d_',pair))
 
 
 max.jointness.ls2 = max.jointness.ls2 %>% 
-  mutate(pair = paste(pmin(as.character(Var1), as.character(Var2)), 
+  mutate(pair = base::paste(pmin(as.character(Var1), as.character(Var2)), 
                       pmax(as.character(Var1), as.character(Var2)), sep = '-')) %>% 
-  distinct(pair) %>% 
-  filter(!grepl('d_',pair))
+  dplyr::distinct(pair) %>% 
+  dplyr::filter(!grepl('d_',pair))
 
 
 max.jointness.yqm = max.jointness.yqm %>% 
-  mutate(pair = paste(pmin(as.character(Var1), as.character(Var2)), 
+  dplyr::mutate(pair = base::paste(pmin(as.character(Var1), as.character(Var2)), 
                       pmax(as.character(Var1), as.character(Var2)), sep = '-')) %>% 
-  distinct(pair) %>% 
-  filter(!grepl('d_',pair))
+  dplyr::distinct(pair) %>% 
+  dplyr::filter(!grepl('d_',pair))
 
 
 # Plot the matrices #
@@ -426,46 +427,46 @@ height = 900
 # Reproduce Figure A.1 in the paper
 
 jointness.yqm %>% 
-  filter(!grepl("d_", Var1)) %>% 
-  filter(!grepl("d_", Var2)) %>% 
-  ggplot(aes(Var1, Var2, fill= value)) + 
-  geom_tile() + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
-  labs(x = "", y = "") + 
-  theme(axis.text=element_text(size=6)) +  
-  scale_fill_continuous( low = "black", high = "red") +
-  theme(legend.text = element_text(size=7), legend.title = element_blank()) + 
-  guides(fill = guide_colourbar(barwidth = 0.5,
+  dplyr::filter(!grepl("d_", Var1)) %>% 
+  dplyr::filter(!grepl("d_", Var2)) %>% 
+  ggplot2::ggplot(aes(Var1, Var2, fill= value)) + 
+  ggplot2::geom_tile() + 
+  ggplot2::theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  ggplot2::labs(x = "", y = "") + 
+  ggplot2::theme(axis.text=element_text(size=6)) +  
+  ggplot2::scale_fill_continuous( low = "black", high = "red") +
+  ggplot2::theme(legend.text = element_text(size=7), legend.title = element_blank()) + 
+  ggplot2::guides(fill = guide_colourbar(barwidth = 0.5,
                                 barheight = 20))
 
 # Reproduce Figure A.3 in the paper
 
 jointness.dw2 %>% 
-  filter(!grepl("d_", Var1)) %>% 
-  filter(!grepl("d_", Var2)) %>% 
-  ggplot(aes(Var1, Var2, fill= value)) + 
-  geom_tile() + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
-  labs(x = "", y = "") + 
-  theme(axis.text=element_text(size=5)) +  
-  scale_fill_continuous( low = "black", high = "red") +
-  theme(legend.text = element_text(size=7), legend.title = element_blank()) + 
-  guides(fill = guide_colourbar(barwidth = 0.5,
+  dplyr::filter(!grepl("d_", Var1)) %>% 
+  dplyr::filter(!grepl("d_", Var2)) %>% 
+  ggplot2::ggplot(aes(Var1, Var2, fill= value)) + 
+  ggplot2::geom_tile() + 
+  ggplot2::theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  ggplot2::labs(x = "", y = "") + 
+  ggplot2::theme(axis.text=element_text(size=5)) +  
+  ggplot2::scale_fill_continuous( low = "black", high = "red") +
+  ggplot2::theme(legend.text = element_text(size=7), legend.title = element_blank()) + 
+  ggplot2::guides(fill = guide_colourbar(barwidth = 0.5,
                                 barheight = 20))
 
 # Reproduce Figure A.4 in the paper
 
 jointness.ls2 %>% 
-  filter(!grepl("d_", Var1)) %>% 
-  filter(!grepl("d_", Var2)) %>% 
-  ggplot(aes(Var1, Var2, fill= value)) + 
-  geom_tile() + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
-  labs(x = "", y = "") + 
-  theme(axis.text=element_text(size=5)) +  
-  scale_fill_continuous( low = "black", high = "red") +
-  theme(legend.text = element_text(size=7), legend.title = element_blank()) + 
-  guides(fill = guide_colourbar(barwidth = 0.5,
+  dplyr::filter(!grepl("d_", Var1)) %>% 
+  dplyr::filter(!grepl("d_", Var2)) %>% 
+  ggplot2:ggplot(aes(Var1, Var2, fill= value)) + 
+  ggplot2:geom_tile() + 
+  ggplot2:theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  ggplot2:labs(x = "", y = "") + 
+  ggplot2:theme(axis.text=element_text(size=5)) +  
+  ggplot2:scale_fill_continuous( low = "black", high = "red") +
+  ggplot2:theme(legend.text = element_text(size=7), legend.title = element_blank()) + 
+  ggplot2:guides(fill = guide_colourbar(barwidth = 0.5,
                                 barheight = 20))
 
 
@@ -473,39 +474,39 @@ jointness.ls2 %>%
 # Model without Fixed Effects: add only time (year) fixed effects  #
 
 nofe_data = fulldata %>% 
-  select(-date,-uncert,-bop,-debttogdp,-gdp,-euribor,-inflation) %>%
+  dplyr::select(-date,-uncert,-bop,-debttogdp,-gdp,-euribor,-inflation) %>%
   
-  mutate(d_2002 = ifelse(year == 2002, 1 , 0),
-         d_2003 = ifelse(year == 2003, 1 , 0),
-         d_2004 = ifelse(year == 2004, 1 , 0),
-         d_2005 = ifelse(year == 2005, 1 , 0),
-         d_2006 = ifelse(year == 2006, 1 , 0),
-         d_2007 = ifelse(year == 2007, 1 , 0),
-         d_2008 = ifelse(year == 2008, 1 , 0),
-         d_2009 = ifelse(year == 2009, 1 , 0),
-         d_2010 = ifelse(year == 2010, 1 , 0),
-         d_2011 = ifelse(year == 2011, 1 , 0),
-         d_2012 = ifelse(year == 2012, 1 , 0),
-         d_2013 = ifelse(year == 2013, 1 , 0),
-         d_2014 = ifelse(year == 2014, 1 , 0),
-         d_2015 = ifelse(year == 2015, 1 , 0),
-         d_2016 = ifelse(year == 2016, 1 , 0),
-         d_2017 = ifelse(year == 2017, 1 , 0),
-         d_2018 = ifelse(year == 2018, 1 , 0),
-         d_2019 = ifelse(year == 2019, 1 , 0),
-         d_2020 = ifelse(year == 2020, 1 , 0),
-         d_2021 = ifelse(year == 2021, 1 , 0)) %>% 
+  dplyr::mutate(d_2002 = dplyr::if_else(year == 2002, 1 , 0),
+         d_2003 = dplyr::if_else(year == 2003, 1 , 0),
+         d_2004 = dplyr::if_else(year == 2004, 1 , 0),
+         d_2005 = dplyr::if_else(year == 2005, 1 , 0),
+         d_2006 = dplyr::if_else(year == 2006, 1 , 0),
+         d_2007 = dplyr::if_else(year == 2007, 1 , 0),
+         d_2008 = dplyr::if_else(year == 2008, 1 , 0),
+         d_2009 = dplyr::if_else(year == 2009, 1 , 0),
+         d_2010 = dplyr::if_else(year == 2010, 1 , 0),
+         d_2011 = dplyr::if_else(year == 2011, 1 , 0),
+         d_2012 = dplyr::if_else(year == 2012, 1 , 0),
+         d_2013 = dplyr::if_else(year == 2013, 1 , 0),
+         d_2014 = dplyr::if_else(year == 2014, 1 , 0),
+         d_2015 = dplyr::if_else(year == 2015, 1 , 0),
+         d_2016 = dplyr::if_else(year == 2016, 1 , 0),
+         d_2017 = dplyr::if_else(year == 2017, 1 , 0),
+         d_2018 = dplyr::if_else(year == 2018, 1 , 0),
+         d_2019 = dplyr::if_else(year == 2019, 1 , 0),
+         d_2020 = dplyr::if_else(year == 2020, 1 , 0),
+         d_2021 = dplyr::if_else(year == 2021, 1 , 0)) %>% 
   
-  select(-year,-country)
+  dplyr::select(-year,-country)
 
 
 
-model_nofe <- bms(nofe_data, burn = n.burn, iter = n.iter,  g = "BRIC", mprior = "random", 
+model_nofe <- BMS::bms(nofe_data, burn = n.burn, iter = n.iter,  g = "BRIC", mprior = "random", 
                   nmodel = 10000, mcmc = "bd", user.int = F,  
                   fixed.reg = year_dummy_names, randomizeTimer = F)
 
 
-coefs_nofe <- coef(model_nofe,  std.coefs = T, order.by.pip = F)[,1:3]
+coefs_nofe <- stats::coef(model_nofe,  std.coefs = T, order.by.pip = F)[,1:3]
 
 # Do not select year fixed effects #
 
@@ -515,37 +516,37 @@ coefs_nofe = coefs_nofe[!row.names(coefs_nofe) %in% c(year_dummy_names),1:3]
 # Note that this is the same dataset used for the no Fixed Effects model #
 
 heredity_data = fulldata %>% 
-  select(-date,-uncert,-bop,-debttogdp,-gdp,-euribor,-inflation) %>% 
+  dplyr::select(-date,-uncert,-bop,-debttogdp,-gdp,-euribor,-inflation) %>% 
 
   
-  mutate(d_2002 = ifelse(year == 2002, 1 , 0),
-         d_2003 = ifelse(year == 2003, 1 , 0),
-         d_2004 = ifelse(year == 2004, 1 , 0),
-         d_2005 = ifelse(year == 2005, 1 , 0),
-         d_2006 = ifelse(year == 2006, 1 , 0),
-         d_2007 = ifelse(year == 2007, 1 , 0),
-         d_2008 = ifelse(year == 2008, 1 , 0),
-         d_2009 = ifelse(year == 2009, 1 , 0),
-         d_2010 = ifelse(year == 2010, 1 , 0),
-         d_2011 = ifelse(year == 2011, 1 , 0),
-         d_2012 = ifelse(year == 2012, 1 , 0),
-         d_2013 = ifelse(year == 2013, 1 , 0),
-         d_2014 = ifelse(year == 2014, 1 , 0),
-         d_2015 = ifelse(year == 2015, 1 , 0),
-         d_2016 = ifelse(year == 2016, 1 , 0),
-         d_2017 = ifelse(year == 2017, 1 , 0),
-         d_2018 = ifelse(year == 2018, 1 , 0),
-         d_2019 = ifelse(year == 2019, 1 , 0),
-         d_2020 = ifelse(year == 2020, 1 , 0),
-         d_2021 = ifelse(year == 2021, 1 , 0)) %>% 
-  select(-year,-country)
+  dplyr::mutate(d_2002 = dplyr::if_else(year == 2002, 1 , 0),
+         d_2003 = dplyr::if_else(year == 2003, 1 , 0),
+         d_2004 = dplyr::if_else(year == 2004, 1 , 0),
+         d_2005 = dplyr::if_else(year == 2005, 1 , 0),
+         d_2006 = dplyr::if_else(year == 2006, 1 , 0),
+         d_2007 = dplyr::if_else(year == 2007, 1 , 0),
+         d_2008 = dplyr::if_else(year == 2008, 1 , 0),
+         d_2009 = dplyr::if_else(year == 2009, 1 , 0),
+         d_2010 = dplyr::if_else(year == 2010, 1 , 0),
+         d_2011 = dplyr::if_else(year == 2011, 1 , 0),
+         d_2012 = dplyr::if_else(year == 2012, 1 , 0),
+         d_2013 = dplyr::if_else(year == 2013, 1 , 0),
+         d_2014 = dplyr::if_else(year == 2014, 1 , 0),
+         d_2015 = dplyr::if_else(year == 2015, 1 , 0),
+         d_2016 = dplyr::if_else(year == 2016, 1 , 0),
+         d_2017 = dplyr::if_else(year == 2017, 1 , 0),
+         d_2018 = dplyr::if_else(year == 2018, 1 , 0),
+         d_2019 = dplyr::if_else(year == 2019, 1 , 0),
+         d_2020 = dplyr::if_else(year == 2020, 1 , 0),
+         d_2021 = dplyr::if_else(year == 2021, 1 , 0)) %>% 
+  dplyr::select(-year,-country)
 
   
 # Need to change interaction variable names #
 # For consistency with BMS package # 
 
 heredity_data = heredity_data %>% 
-  rename("rec#synch_lag1" = recsynch_lag1,
+  dplyr::rename("rec#synch_lag1" = recsynch_lag1,
          "rec#synch_lag2" = recsynch_lag2,
          "rec#synch_lag3" = recsynch_lag3,
          "rec#synch_lag4" = recsynch_lag4,
@@ -644,12 +645,12 @@ heredity_data = heredity_data %>%
          "draghi#inflation_lag4" = draghiinflation_lag4)
 
 
-model_heredity =  bms(heredity_data, burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random", 
+model_heredity =  BMS::bms(heredity_data, burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random", 
                       nmodel = 10000, mcmc = "bd.int", user.int = F, 
                       fixed.reg = year_dummy_names, randomizeTimer = F)
 
 
-coefs_heredity <- coef(model_heredity,  std.coefs = T, order.by.pip = F)
+coefs_heredity <- stats::coef(model_heredity,  std.coefs = T, order.by.pip = F)
 
 # Do not select the year fixed effects #
 
@@ -657,6 +658,6 @@ coefs_heredity = coefs_heredity[!row.names(coefs_heredity) %in% year_dummy_names
 
 # Reproduce all columns of Table 1 in the paper 
 
-round(coefs_fe, 4)
-round(coefs_nofe, 4)
-round(coefs_heredity, 4)
+base::round(coefs_fe, 4)
+base::round(coefs_nofe, 4)
+base::round(coefs_heredity, 4)
