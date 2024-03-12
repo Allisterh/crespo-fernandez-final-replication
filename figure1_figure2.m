@@ -8,7 +8,7 @@ temp = matlab.desktop.editor.getActive;
 cd(fileparts(temp.Filename));
 
 % Read the data
-yields_data = readtable("yields_data.xls"); 
+yields_data = readtable("data/yields_data.xls"); 
 date = table2array(yields_data(:,1)); 
 spain = table2array(yields_data(:,2)); 
 greece = table2array(yields_data(:,3)); 
