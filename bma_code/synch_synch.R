@@ -109,22 +109,22 @@ max.jointness.dw2 = max.jointness.dw2 %>%
   mutate(pair = paste(pmin(as.character(Var1), as.character(Var2)), 
                       pmax(as.character(Var1), as.character(Var2)), sep = '-')) %>% 
   distinct(pair) %>% 
-  filter(!grepl('d_',pair))
-
+  dplyr::filter(!grepl('year_',pair)) %>% 
+  dplyr::filter(!grepl('country_',pair))
 
 max.jointness.ls2 = max.jointness.ls2 %>% 
   mutate(pair = paste(pmin(as.character(Var1), as.character(Var2)), 
                       pmax(as.character(Var1), as.character(Var2)), sep = '-')) %>% 
   distinct(pair) %>% 
-  filter(!grepl('d_',pair))
-
+  dplyr::filter(!grepl('year_',pair)) %>% 
+  dplyr::filter(!grepl('country_',pair))
 
 max.jointness.yqm = max.jointness.yqm %>% 
   mutate(pair = paste(pmin(as.character(Var1), as.character(Var2)), 
                       pmax(as.character(Var1), as.character(Var2)), sep = '-')) %>% 
   distinct(pair) %>% 
-  filter(!grepl('d_',pair))
-
+  dplyr::filter(!grepl('year_',pair)) %>% 
+  dplyr::filter(!grepl('country_',pair))
 
 # Plot the matrices #
 # Recall: we do not show the year fixed effects #
@@ -134,8 +134,10 @@ max.jointness.yqm = max.jointness.yqm %>%
 # Reproduce Figure A.5 in the paper
 
 jointness.dw2 %>% 
-  filter(!grepl("d_", Var1)) %>% 
-  filter(!grepl("d_", Var2)) %>% 
+  dplyr::filter(!grepl("year_", Var1)) %>% 
+  dplyr::filter(!grepl("year_", Var2)) %>% 
+  dplyr::filter(!grepl("country_", Var1)) %>% 
+  dplyr::filter(!grepl("country_", Var2)) %>% 
   ggplot(aes(Var1, Var2, fill= value)) + 
   geom_tile() + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
@@ -149,8 +151,10 @@ jointness.dw2 %>%
 # Reproduce Figure A.6 in the paper
 
 jointness.ls2 %>% 
-  filter(!grepl("d_", Var1)) %>% 
-  filter(!grepl("d_", Var2)) %>% 
+  dplyr::filter(!grepl("year_", Var1)) %>% 
+  dplyr::filter(!grepl("year_", Var2)) %>% 
+  dplyr::filter(!grepl("country_", Var1)) %>% 
+  dplyr::filter(!grepl("country_", Var2)) %>% 
   ggplot(aes(Var1, Var2, fill= value)) + 
   geom_tile() + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
@@ -165,7 +169,10 @@ jointness.ls2 %>%
 
 jointness.yqm %>% 
   filter(!grepl("d_", Var1)) %>% 
-  filter(!grepl("d_", Var2)) %>% 
+  dplyr::filter(!grepl("year_", Var1)) %>% 
+  dplyr::filter(!grepl("year_", Var2)) %>% 
+  dplyr::filter(!grepl("country_", Var1)) %>% 
+  dplyr::filter(!grepl("country_", Var2)) %>% 
   ggplot(aes(Var1, Var2, fill= value)) + 
   geom_tile() + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
