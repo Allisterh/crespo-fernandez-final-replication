@@ -16,7 +16,7 @@ for (file in func.files) {
 
 # Read the corresponding dataset 
 
-fulldata = readxl::read_excel(file.path(data_path, "synch_synch.xlsx"))
+fulldata = readxl::read_excel(base::file.path(data_path, "synch_synch.xlsx"))
 
 # Add Draghi dummy + interactions
 
