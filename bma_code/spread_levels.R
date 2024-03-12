@@ -84,7 +84,7 @@ heredity_data = fulldata %>%
 # Need to change interaction variable names #
 # For consistency with BMS package # 
 
-heredity_data = 
+heredity_data = rename.spread(heredity_data)
 
 model_heredity =  BMS::bms(heredity_data, burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random", 
                       nmodel = 10000, mcmc = "bd.int", user.int = F, randomizeTimer = F, 
