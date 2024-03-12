@@ -427,3 +427,33 @@ rename.spread = function(my_data){
   
   
 }
+
+# Functions to fit BMS models 
+
+fit.bms = function(my_data, model_type){
+  
+  if (model_type==1) { # Model with fixed effects 
+    
+    BMS::bms(my_data, burn = n.burn.bma, iter = n.iter.bma, g = "BRIC", mprior = "random", 
+             nmodel = 10000, mcmc = "bd", user.int = F, 
+             fixed.reg = c(year_dummy_names, country_dummy_names), randomizeTimer = F)
+    
+  } else if (model_type==2) { # Standard BMA model (no fixed effects)
+    
+    BMS::bms(my_data, burn = n.burn.bma, iter = n.iter.bma, g = "BRIC", mprior = "random", 
+             nmodel = 10000, mcmc = "bd", user.int = F, 
+             fixed.reg = year_dummy_names, randomizeTimer = F)
+  
+  } else if (model_type==3){ # Heredity model
+    
+    
+    BMS::bms(my_data, burn = n.burn.bma, iter = n.iter.bma, g = "BRIC", mprior = "random", 
+             nmodel = 10000, mcmc = "bd.int", user.int = F, 
+             fixed.reg = year_dummy_names, randomizeTimer = F)
+    
+    
+  }
+  
+  
+  
+}
