@@ -6,8 +6,13 @@ data_path = "../bma_data"
 
 # Number of iterations and burn-in for BMA models 
 
-n.burn = 1000
-n.iter = 2000
+n.burn.bma = 10000
+n.iter.bma = 1e+07
+
+# Number of iterations and burn-in for BMA models (forecast section)
+
+n.burn.fcast = 10000
+n.iter.fcast = 500000
 
 # Width and height for jointness plots
 
@@ -53,6 +58,7 @@ country_dummy_names = c("country_belgium",
                         "country_spain")
 
 
+# Create PI(I)GS indicator variable to subset the forecasted measures #
 
-# Number of iterations and burn-in for BMA models (forecast section)
+piigs_subset = c("spain", "portugal", "ireland", "greece", "italy")
 
