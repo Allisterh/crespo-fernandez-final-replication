@@ -9,11 +9,11 @@ pacman::p_load(readxl, dplyr, tidyr, BMS, Cairo, reshape2,
 
 # Load the necessary functions 
 
-func.files <- list.files(path = "../funcs", pattern = "\\.R$", full.names = TRUE)
+func.files <- base::list.files(path = "../funcs", pattern = "\\.R$", full.names = TRUE)
 
 for (file in func.files) {
   
-  source(file)
+  base::source(file)
   
 }
 
@@ -27,12 +27,12 @@ n.iter = 1e7
 
 data_path = "../bma_data"
 
-fulldata = read_excel(file.path(data_path, "synch_synch.xlsx"))
+fulldata = readxl::read_excel(file.path(data_path, "synch_synch.xlsx"))
 
 # Add Draghi dummy + interactions
 
 fulldata = fulldata %>% 
-  mutate(draghi = ifelse(date >= '2012-07-01', 1, 0), 
+  dplyr::mutate(draghi = ifelse(date >= '2012-07-01', 1, 0), 
          draghisynch_lag1 = draghi * synch_lag1, 
          draghisynch_lag2 = draghi * synch_lag2, 
          draghisynch_lag3 = draghi * synch_lag3, 
@@ -113,9 +113,9 @@ country_dummy_names = c("d_belgium",
 
 
 fe_data = fulldata %>% 
-  select(-date,-uncert,-bop,-debttogdp,-gdp,-euribor,-inflation) %>% 
+  dplyr::select(-date,-uncert,-bop,-debttogdp,-gdp,-euribor,-inflation) %>% 
   
-  mutate(d_belgium = ifelse(country == "belgium", 1 , 0),
+  dplyr::mutate(d_belgium = ifelse(country == "belgium", 1 , 0),
          d_finland = ifelse(country == "finland", 1 , 0),
          d_france = ifelse(country == "france", 1 , 0),
          d_germany = ifelse(country == "germany", 1 , 0),
@@ -130,7 +130,7 @@ fe_data = fulldata %>%
          d_slovenia = ifelse(country == "slovenia", 1 , 0),
          d_spain = ifelse(country == "spain", 1 , 0)) %>%
 
-  mutate(d_2002 = ifelse(year == 2002, 1 , 0),
+  dplyr::mutate(d_2002 = ifelse(year == 2002, 1 , 0),
          d_2003 = ifelse(year == 2003, 1 , 0),
          d_2004 = ifelse(year == 2004, 1 , 0),
          d_2005 = ifelse(year == 2005, 1 , 0),
@@ -150,14 +150,14 @@ fe_data = fulldata %>%
          d_2019 = ifelse(year == 2019, 1 , 0),
          d_2020 = ifelse(year == 2020, 1 , 0),
          d_2021 = ifelse(year == 2021, 1 , 0)) %>% 
-  select(-year,-country, -pigs)
+  dplyr::select(-year,-country, -pigs)
 
-model_fe <-  bms(fe_data, burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random", 
+model_fe <-  BMS::bms(fe_data, burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random", 
                  nmodel = 10000, mcmc = "bd", user.int = T, 
                  fixed.reg = c(year_dummy_names, country_dummy_names), randomizeTimer = F)
 
 
-coefs_fe <- coef(model_fe,  std.coefs = T, order.by.pip = F)
+coefs_fe <- stats::coef(model_fe,  std.coefs = T, order.by.pip = F)
 
 # Do not select the Fixed Effects results (year & country) #
 
@@ -173,7 +173,7 @@ jointness.yqm = jointness.score(model_fe, method = "YQM")
 
 # Reorganize the columns of the matrix #
 
-col.order = rownames(coef(model_fe, order.by.pip = F))
+col.order = base::rownames(stats::coef(model_fe, order.by.pip = F))
 
 jointness.dw2 = jointness.dw2[col.order,col.order]
 jointness.ls2 = jointness.ls2[col.order,col.order]
@@ -185,15 +185,15 @@ jointness.yqm = jointness.yqm[col.order,col.order]
 
 # Melt the jointness measures to discover the maximum values #
 
-jointness.dw2 = melt(jointness.dw2)
-jointness.ls2 = melt(jointness.ls2)
-jointness.yqm = melt(jointness.yqm)
+jointness.dw2 = reshape2::melt(jointness.dw2)
+jointness.ls2 = reshape2::melt(jointness.ls2)
+jointness.yqm = reshape2::melt(jointness.yqm)
 
 
 # Convert to numeric to turn NaN and . into NA values # 
 
 jointness.dw2 = jointness.dw2 %>% 
-  mutate(value = as.numeric(value))
+  dplyr::mutate(value = as.numeric(value))
 
 jointness.ls2 = jointness.ls2 %>% 
   mutate(value = as.numeric(value))
