@@ -169,9 +169,7 @@ fe_data = fulldata %>%
   dummy_cols(select_columns = "country", remove_first_dummy = T) %>% 
   dplyr::select(-year,-country, -pigs)
 
-model_fe <- BMS::bms(fe_data, burn = n.burn, iter = n.iter, g = "BRIC", mprior = "random", 
-                 nmodel = 10000, mcmc = "bd", user.int = F, 
-                 fixed.reg = c(year_dummy_names, country_dummy_names), randomizeTimer = F)
+model_fe <- fit.bms(fe_data, 1)
 
 
 coefs_fe <- stats::coef(model_fe,  std.coefs = T, order.by.pip = F)
