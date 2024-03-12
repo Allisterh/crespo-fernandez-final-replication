@@ -4,6 +4,7 @@
 # Clean working space and load necessary libraries #
 
 rm(list = ls())
+base::set.seed(14091998)
 
 # Load the necessary functions, packages, and specifications
 
@@ -502,8 +503,8 @@ f_synch_index = which( colnames(bma.synch.levels.forecast.data)=="f_synch" ) # G
 country_index = which( colnames(bma.synch.levels.forecast.data)=="country" )
 synch_index = which( colnames(bma.synch.levels.forecast.data)=="synch" )
 date_index = which( colnames(bma.synch.levels.forecast.data)=="date" )
-d_2019_index = which( colnames(bma.synch.levels.forecast.data)=="d_2019" )
-d_2020_index = which( colnames(bma.synch.levels.forecast.data)=="d_2020" )
+d_2019_index = which( colnames(bma.synch.levels.forecast.data)=="year_2019" )
+d_2020_index = which( colnames(bma.synch.levels.forecast.data)=="year_2020" )
 
 # Arrange by country and date for consistency
 
