@@ -2,7 +2,7 @@
 
 # String with the data path
 
-data_path = "bma_data"
+data_path = "data"
 
 # Number of iterations and burn-in for BMA models 
 
