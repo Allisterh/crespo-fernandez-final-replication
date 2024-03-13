@@ -24,7 +24,7 @@ n.iter.fcast = 500000
 width = 1600
 height = 900
 
-# Create year and country dummy names
+# Create year and country dummy names (important: only for BMA models)
 
 year_dummy_names = c("year_2002",
                      "year_2003",
