@@ -4,11 +4,6 @@
 
 data_path = "data"
 
-# Load latex fonts
-
-font_import(pattern = "lmroman*") 
-loadfonts()
-
 # Number of iterations and burn-in for BMA models 
 
 n.burn.bma = 10000
