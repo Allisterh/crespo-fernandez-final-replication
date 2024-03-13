@@ -154,18 +154,20 @@ ar_forecast_data = ar_forecast_data %>%
     
     
     
-  )
+  ) %>% 
+  dplyr::ungroup()
   
 
 # Create variable for directional accuracy
 
 ar_forecast_data = ar_forecast_data %>% 
   dplyr::group_by(country) %>% 
-  dplyr::mutate(synch_diff = c(NA, diff(synch)), 
-         f_synch_diff = c(NA, diff(f_synch)), 
-         synch_direction = ifelse(synch_diff > 0, "up", "down"), 
-         f_synch_direction = ifelse(f_synch_diff > 0, "up", "down")) %>% 
-  dplyr::select(-synch_diff, -f_synch_diff)
+  dplyr::mutate(synch_diff = synch - dplyr::lag(synch), 
+         f_synch_diff = f_synch - dplyr::lag(f_synch), 
+         synch_direction = dplyr::if_else(synch_diff > 0, "up", "down"), 
+         f_synch_direction = dplyr::if_else(f_synch_diff > 0, "up", "down")) %>% 
+  dplyr::select(-synch_diff, -f_synch_diff) %>% 
+  dplyr::ungroup()
   
   
 
@@ -261,11 +263,12 @@ ar.country.data = dplyr::bind_rows(country.list) %>%
 
 ar.country.data = ar.country.data %>% 
   dplyr::group_by(country) %>% 
-  dplyr::mutate(synch_diff = c(NA, base::diff(synch)), 
-         f_synch_diff = c(NA, base::diff(f_synch)), 
+  dplyr::mutate(synch_diff = synch - dplyr::lag(synch), 
+         f_synch_diff = f_synch - dplyr::lag(f_synch), 
          synch_direction = dplyr::if_else(synch_diff > 0, "up", "down"), 
          f_synch_direction = dplyr::if_else(f_synch_diff > 0, "up", "down")) %>% 
-  dplyr::select(-synch_diff, -f_synch_diff)
+  dplyr::select(-synch_diff, -f_synch_diff) %>% 
+  dplyr::ungroup()
 
 # Create squared difference between realization and forecast #
 
@@ -592,11 +595,12 @@ bma.synch.levels.forecast.data = bma.synch.levels.forecast.data %>%
 
 bma.synch.levels.forecast.data = bma.synch.levels.forecast.data %>%
   dplyr::group_by(country) %>%
-  dplyr::mutate(synch_diff = c(NA, diff(synch)),
-         f_synch_diff = c(NA, diff(f_synch)),
-         synch_direction = ifelse(synch_diff > 0, "up", "down"),
-         f_synch_direction = ifelse(f_synch_diff > 0, "up", "down")) %>%
-  dplyr::select(-synch_diff, -f_synch_diff)
+  dplyr::mutate(synch_diff = synch - dplyr::lag(synch),
+         f_synch_diff = f_synch - dplyr::lag(f_synch),
+         synch_direction = dplyr::if_else(synch_diff > 0, "up", "down"),
+         f_synch_direction = dplyr::if_else(f_synch_diff > 0, "up", "down")) %>%
+  dplyr::select(-synch_diff, -f_synch_diff) %>% 
+  dplyr::ungroup()
 
 
 
@@ -710,11 +714,12 @@ bma.synch.synch.forecast.data = bma.synch.synch.forecast.data %>%
 
 bma.synch.synch.forecast.data = bma.synch.synch.forecast.data %>%
   dplyr::group_by(country) %>%
-  dplyr::mutate(synch_diff = c(NA, diff(synch)),
-         f_synch_diff = c(NA, diff(f_synch)),
-         synch_direction = ifelse(synch_diff > 0, "up", "down"),
-         f_synch_direction = ifelse(f_synch_diff > 0, "up", "down")) %>%
-  dplyr::select(-synch_diff, -f_synch_diff)
+  dplyr::mutate(synch_diff = synch - dplyr::lag(synch),
+         f_synch_diff = f_synch - dplyr::lag(f_synch),
+         synch_direction = dplyr::if_else(synch_diff > 0, "up", "down"),
+         f_synch_direction = dplyr::if_else(f_synch_diff > 0, "up", "down")) %>%
+  dplyr::select(-synch_diff, -f_synch_diff) %>% 
+  dplyr::ungroup()
 
 
 
