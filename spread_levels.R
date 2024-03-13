@@ -40,6 +40,19 @@ fe_data = fulldata %>%
   dummy_cols(select_columns = "country", remove_first_dummy = T) %>% 
   dplyr::select(-year,-country, -pigs)
 
+
+# Create year and country dummy names 
+
+year_dummy_names = fe_data %>% 
+  dplyr::select(dplyr::starts_with("year_")) %>% 
+  base::colnames()
+
+country_dummy_names = fe_data %>% 
+  dplyr::select(dplyr::starts_with("country_")) %>% 
+  base::colnames()
+
+# Fit the BMS model
+
 model_fe <-  fit.bms(fe_data, 1)
 
 
