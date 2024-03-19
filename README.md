@@ -1,4 +1,4 @@
-# "Explaining Long-Term Bond Yields Synchronization Dynamics in Europe"  Replication Package (Crespo \& Fernandez, 2024)
+# Replication files for Cuaresma, J. C., & Fernández, O. (2024). Explaining long-term bond yields synchronization dynamics in Europe. Economic Modelling, 106684.
 
 
 This readme file is intended to replicate the results of the paper titled “Explaining Long-Term Bond Yields Synchronization Dynamics in Europe”, written by Jesus Crespo Cuaresma and Oscar Fernandez, and published in the journal *Economic modelling* ([link to the paper](https://www.sciencedirect.com/science/article/pii/S0264999324000403)). All codes contain documentation which should help the researcher to replicate our results in a user-friendly format. 
