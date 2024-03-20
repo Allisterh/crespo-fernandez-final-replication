@@ -27,13 +27,14 @@ The zipped folder attached contains two folders with all the necessary data file
 
 	4. forecast_code.R: this code is intended to import the files synch levels.xlsx and synch synch.xlsx with the purpose of obtaining the results of the forecasts ONLY for the following models: Pooled AR(1), Country-specific AR(1), BMA synch-levels, BMA synch-synch. The code computes the rolling forecasts of the synchronization variable together with multiple forecasting indicators (RMSE, Theil's U, Accuracy, Hit Rate, False Alarm, Kuiper score). The code reproduces a part of the following output from the paper: Table 3, Table A.5.
 
-	5. pip_50_synch_levels.R: this code is intended to import the file synch levels.xlsx with the purpose of obtaining the forecasts results ONLY for the following models: BMA synch-levels (only those variables with PIP>50\%). We separate the codes for the sake of readability. The code computes the rolling forecasts of the synchronization variable together with multiple forecasting indicators (RMSE, Theil's U, Accuracy, Hit Rate, False Alarm, Kuiper score). The code reproduces a part of the following output from the paper: Table 3, Table A.5.   
-
-	6. figure1_figure2.m: this code is intended to import the files s_t.xlsx and yields_data.xlsx to reproduce the following figures found in the paper: Figure 1, Figure 2.
- 	7. ~funcs.R: this file contains all the necessary functions to reproduce the results.
-	8. ~packages.R: this file loads all the necessary packages to reproduce the results. 
- 	9. ~specs.R: this file contains all the necessary specifications (number of burn-ins, data paths, and etcetera) to reproduce the results. 
-
-
+	5. pip_50_synch_levels.R: this code is intended to import the file synch levels.xlsx with the purpose of obtaining the forecasts results ONLY for the following models: BMA synch-levels (only those variables with PIP>50\%). We separate the codes for the sake of readability. The code computes the rolling forecasts of the synchronization variable together with multiple forecasting indicators (RMSE, Theil's U, Accuracy, Hit Rate, False Alarm, Kuiper score). The code reproduces a part of the following output from the paper: Table 3, Table A.5.
 	6. pip_50_synch_synch.R: this code is intended to import the file synch synch.xlsx with the purpose of obtaining the forecasts results ONLY for the following models: BMA synch-synch (only those variables with PIP>50\%). We separate the codes for the sake of readability. The code computes the rolling forecasts of the synchronization variable together with multiple forecasting indicators (RMSE, Theil's U, Accuracy, Hit Rate, False Alarm, Kuiper score). The code reproduces a part of the following output from the paper: Table 3, Table A.5.
+
+	7. figure1_figure2.m: this code is intended to import the files s_t.xlsx and yields_data.xlsx to reproduce the following figures found in the paper: Figure 1, Figure 2.
+ 	8. ~funcs.R: this file contains all the necessary functions to reproduce the results.
+	9. ~packages.R: this file loads all the necessary packages to reproduce the results. 
+ 	10. ~specs.R: this file contains all the necessary specifications (number of burn-ins, data paths, and etcetera) to reproduce the results. 
+
+
+	
 
