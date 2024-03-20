@@ -14,8 +14,8 @@ The zipped folder attached contains two folders with all the necessary data file
 	1. synch_levels.xlsx: this file contains the data on the synchronization rate in the long-term government bond yield and the independent variables in levels.
 	2. synch_synch.xlsx: this file contains the data on the synchronization rate in the long-term government bond yield and the synchronization rates of the independent variables.
 	3. spread_levels: this file contains the data on the long-term government bond yield spreads (against the German yield) and the independent variables in levels.
-	4. s_t.xlsx: this file contains the data on the standard deviation in long-term government bond yields
-    	5. yields data.xlsx: this file contains data on the yield spread (against the German yield) for the GIIPS countries
+	4. s_t.xlsx: this file contains the data on the standard deviation in long-term government bond yields.
+    	5. yields_data.xlsx: this file contains data on the yield spread (against the German yield) for the GIIPS countries.
 
 2. **scripts**: this folder contains all the necessary code files to reproduce the results of the paper:
 	1. synch_levels.R: this code is intended to import the file synch levels.xlsx to reproduce the results were we regress the yield synchronization rates on the levels of the independent variables. The code produces the following output from the paper: Table A.3, Figure 3, Table A.1, Table A.2, Figure A.1, Figure A.3, Figure A.4, Table 1.
