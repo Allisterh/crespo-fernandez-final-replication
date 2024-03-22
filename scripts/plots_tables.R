@@ -20,11 +20,11 @@ readxl::read_xls(file.path(data_path, "yields_data.xls"), range = "A16:G287") %>
   mutate(across(spain:ireland, ~ .x - germany), 
          greece = dplyr::if_else(date==as.Date("2015-07-01"), NA, greece)) %>% 
   ggplot2::ggplot(aes(x = date)) + 
-  ggplot2::geom_line(aes(y = spain, colour="Spain")) + 
-  ggplot2::geom_line(aes(y = greece, colour="Greece")) + 
-  ggplot2::geom_line(aes(y = portugal, colour="Portugal")) + 
-  ggplot2::geom_line(aes(y = italy, colour="Italy")) + 
-  ggplot2::geom_line(aes(y = ireland, colour="Ireland")) +
+  ggplot2::geom_line(aes(y = spain, colour="Spain"), linewidth = .7) + 
+  ggplot2::geom_line(aes(y = greece, colour="Greece"), linewidth = .7) + 
+  ggplot2::geom_line(aes(y = portugal, colour="Portugal"), linewidth = .7) + 
+  ggplot2::geom_line(aes(y = italy, colour="Italy"), linewidth = .7) + 
+  ggplot2::geom_line(aes(y = ireland, colour="Ireland"), linewidth = .7) +
   scale_color_manual(name = "", values = c("Spain" = "darkblue", "Greece" = "red", 
                                            "Portugal" = "green", "Italy" = "lightblue", 
                                            "Ireland" = "yellow")) +
@@ -32,17 +32,32 @@ readxl::read_xls(file.path(data_path, "yields_data.xls"), range = "A16:G287") %>
   labs(x = "", y = "Spread against German yield (in %)") + 
   theme(legend.position = c(0.3, 0.7), 
         legend.background = element_blank(),
-        legend.box.background = element_rect(colour = "black")) +
-  theme(text=element_text(family="LM Roman 10"))
+        legend.box.background = element_rect(colour = "black")) 
+
 
 # Produce Figure 3 in the paper (originally in Matlab)
 
 readxl::read_xlsx(file.path(data_path, "s_t.xlsx")) %>% 
+  dplyr::mutate(date = as.Date(date)) %>% 
   ggplot2::ggplot(aes(x = date, y = synch)) + 
-  ggplot2::geom_line(color = "darkblue") +
+  ggplot2::geom_line(color = "darkblue", linewidth = .7) +
   ggplot2::labs(x = "", y = "Cross-country Standard deviation of \n long-term government bond yields") +
-  ggplot2::theme_light() + 
-  theme(text=element_text(family="LM Roman 10"))
+  ggplot2::theme_light() +
+  geom_vline(xintercept = as.Date("2001-01-01"),
+             color = "black", size = .7, linetype = "dashed") +
+  geom_vline(xintercept = as.Date("2007-01-01"),
+             color = "black", size = .7, linetype = "dashed") +
+  geom_vline(xintercept = as.Date("2009-01-01"),
+             color = "black", size = .7, linetype = "dashed") +
+  geom_vline(xintercept = as.Date("2014-01-01"),
+             color = "black", size = .7, linetype = "dashed") +
+  geom_vline(xintercept = as.Date("2015-01-01"),
+             color = "black", size = .7, linetype = "dashed") +
+  geom_text(aes(x=as.Date("2001-01-01"), label="\n Greece", y=6), colour="black", angle=90, size = 3) + 
+  geom_text(aes(x=as.Date("2007-01-01"), label="\n Slovenia", y=6), colour="black", angle=90, size = 3) + 
+  geom_text(aes(x=as.Date("2009-01-01"), label="\n Slovakia", y=6), colour="black", angle=90, size = 3) + 
+  geom_text(aes(x=as.Date("2014-01-01"), label="\n Latvia", y=6), colour="black", angle=90, size = 3) + 
+  geom_text(aes(x=as.Date("2015-01-01"), label="\n Lithuania", y=6), colour="black", angle=90, size = 3) 
 
 # Produce state-dependent synchronization tests (Table A.3 in the paper)
 

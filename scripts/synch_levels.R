@@ -14,9 +14,9 @@ for (file in func.files) {
   
 }
 
-# Read the corresponding dataset 
+# Read the corresponding dataset
 
-fulldata = readxl::read_excel(base::file.path(data_path, "synch_synch.xlsx"))
+fulldata = readxl::read_excel(base::file.path(data_path, "synch_levels.xlsx"))
 
 # Add Draghi dummy + interactions
 
@@ -32,14 +32,26 @@ fulldata = add.draghi.synch(fulldata)
 # All countries except Spain, all years except for 2021 #
 # Important: to avoid multicollinearity issues, do not estimate dummy for PI(I)GS #
 
+
 fe_data = fulldata %>% 
   dplyr::select(-date,-uncert,-bop,-debttogdp,-gdp,-euribor,-inflation) %>% 
-  
   dummy_cols(select_columns = "year", remove_first_dummy = T) %>%
   dummy_cols(select_columns = "country", remove_first_dummy = T) %>% 
   dplyr::select(-year,-country, -pigs)
 
-model_fe <-  fit.bms(fe_data, 1)
+# Create year and country dummy names 
+
+year_dummy_names = fe_data %>% 
+  dplyr::select(dplyr::starts_with("year_")) %>% 
+  base::colnames()
+
+country_dummy_names = fe_data %>% 
+  dplyr::select(dplyr::starts_with("country_")) %>% 
+  base::colnames()
+
+# Fit the BMS model
+
+model_fe <- fit.bms(fe_data, 1)
 
 
 coefs_fe <- stats::coef(model_fe,  std.coefs = T, order.by.pip = F)
@@ -91,76 +103,79 @@ max.jointness.yqm = jointness.yqm %>%
   dplyr::filter(!grepl('year_',pair)) %>% 
   dplyr::filter(!grepl('country_',pair))
 
+
 # Plot the matrices #
 # Recall: we do not show the year fixed effects #
 
 
 
-# Reproduce Figure A.5 in the paper
+
+# Reproduce Figure A.1 in the paper
+
+jointness.yqm %>% 
+  dplyr::filter(!grepl("year_", Var1)) %>% 
+  dplyr::filter(!grepl("year_", Var2)) %>% 
+  dplyr::filter(!grepl("country_", Var1)) %>% 
+  dplyr::filter(!grepl("country_", Var2)) %>% 
+  ggplot2::ggplot(aes(Var1, Var2, fill= value)) + 
+  ggplot2::geom_tile() + 
+  ggplot2::theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  ggplot2::labs(x = "", y = "") + 
+  ggplot2::theme(axis.text=element_text(size=6)) +  
+  ggplot2::scale_fill_continuous( low = "black", high = "red") +
+  ggplot2::theme(legend.text = element_text(size=7), legend.title = element_blank()) + 
+  ggplot2::guides(fill = guide_colourbar(barwidth = 0.5,
+                                barheight = 20))
+
+# Reproduce Figure A.3 in the paper
 
 jointness.dw2 %>% 
   dplyr::filter(!grepl("year_", Var1)) %>% 
   dplyr::filter(!grepl("year_", Var2)) %>% 
   dplyr::filter(!grepl("country_", Var1)) %>% 
   dplyr::filter(!grepl("country_", Var2)) %>% 
-  ggplot(aes(Var1, Var2, fill= value)) + 
-  geom_tile() + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
-  labs(x = "", y = "") + 
-  theme(axis.text=element_text(size=5)) +  
-  scale_fill_continuous( low = "black", high = "red") +
-  theme(legend.text = element_text(size=7), legend.title = element_blank()) + 
-  guides(fill = guide_colourbar(barwidth = 0.5,
+  ggplot2::ggplot(aes(Var1, Var2, fill= value)) + 
+  ggplot2::geom_tile() + 
+  ggplot2::theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  ggplot2::labs(x = "", y = "") + 
+  ggplot2::theme(axis.text=element_text(size=5)) +  
+  ggplot2::scale_fill_continuous( low = "black", high = "red") +
+  ggplot2::theme(legend.text = element_text(size=7), legend.title = element_blank()) + 
+  ggplot2::guides(fill = guide_colourbar(barwidth = 0.5,
                                 barheight = 20))
 
-# Reproduce Figure A.6 in the paper
+# Reproduce Figure A.4 in the paper
 
 jointness.ls2 %>% 
   dplyr::filter(!grepl("year_", Var1)) %>% 
   dplyr::filter(!grepl("year_", Var2)) %>% 
   dplyr::filter(!grepl("country_", Var1)) %>% 
   dplyr::filter(!grepl("country_", Var2)) %>% 
-  ggplot(aes(Var1, Var2, fill= value)) + 
-  geom_tile() + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
-  labs(x = "", y = "") + 
-  theme(axis.text=element_text(size=5)) +  
-  scale_fill_continuous( low = "black", high = "red") +
-  theme(legend.text = element_text(size=7), legend.title = element_blank()) + 
-  guides(fill = guide_colourbar(barwidth = 0.5,
+  ggplot2::ggplot(aes(Var1, Var2, fill= value)) + 
+  ggplot2::geom_tile() + 
+  ggplot2::theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  ggplot2::labs(x = "", y = "") + 
+  ggplot2::theme(axis.text=element_text(size=5)) +  
+  ggplot2::scale_fill_continuous( low = "black", high = "red") +
+  ggplot2::theme(legend.text = element_text(size=7), legend.title = element_blank()) + 
+  ggplot2::guides(fill = guide_colourbar(barwidth = 0.5,
                                 barheight = 20))
 
-# Reproduce Figure A.2 in the paper
 
-jointness.yqm %>% 
-  filter(!grepl("d_", Var1)) %>% 
-  dplyr::filter(!grepl("year_", Var1)) %>% 
-  dplyr::filter(!grepl("year_", Var2)) %>% 
-  dplyr::filter(!grepl("country_", Var1)) %>% 
-  dplyr::filter(!grepl("country_", Var2)) %>% 
-  ggplot(aes(Var1, Var2, fill= value)) + 
-  geom_tile() + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
-  labs(x = "", y = "") + 
-  theme(axis.text=element_text(size=6)) +  
-  scale_fill_continuous( low = "black", high = "red") +
-  theme(legend.text = element_text(size=7), legend.title = element_blank()) + 
-  guides(fill = guide_colourbar(barwidth = 0.5,
-                                barheight = 20))
 
 # Model without Fixed Effects: add only time (year) fixed effects  #
 
 nofe_data = fulldata %>% 
-  select(-date,-uncert,-bop,-debttogdp,-gdp,-euribor,-inflation) %>%
+  dplyr::select(-date,-uncert,-bop,-debttogdp,-gdp,-euribor,-inflation) %>%
   dummy_cols(select_columns = "year", remove_first_dummy = T) %>%
-  select(-year,-country)
+  dplyr::select(-year,-country)
 
 
 
 model_nofe <- fit.bms(nofe_data, 2)
 
 
-coefs_nofe <- coef(model_nofe,  std.coefs = T, order.by.pip = F)[,1:3]
+coefs_nofe <- stats::coef(model_nofe,  std.coefs = T, order.by.pip = F)[,1:3]
 
 # Do not select year fixed effects #
 
@@ -170,9 +185,9 @@ coefs_nofe = coefs_nofe[!row.names(coefs_nofe) %in% c(year_dummy_names),1:3]
 # Note that this is the same dataset used for the no Fixed Effects model #
 
 heredity_data = fulldata %>% 
-  select(-date,-uncert,-bop,-debttogdp,-gdp,-euribor,-inflation) %>% 
+  dplyr::select(-date,-uncert,-bop,-debttogdp,-gdp,-euribor,-inflation) %>% 
   dummy_cols(select_columns = "year", remove_first_dummy = T) %>%
-  select(-year,-country)
+  dplyr::select(-year,-country)
 
   
 # Need to change interaction variable names #
@@ -183,15 +198,14 @@ heredity_data = rename.synch(heredity_data)
 model_heredity =  fit.bms(heredity_data, 3)
 
 
-coefs_heredity <- coef(model_heredity,  std.coefs = T, order.by.pip = F)
+coefs_heredity <- stats::coef(model_heredity,  std.coefs = T, order.by.pip = F)
 
 # Do not select the year fixed effects #
 
 coefs_heredity = coefs_heredity[!row.names(coefs_heredity) %in% year_dummy_names,1:3]
 
+# Reproduce all columns of Table 1 in the paper 
 
-# Reproduce all columns of Table 2 in the paper 
-
-round(coefs_fe, 4)
-round(coefs_nofe, 4)
-round(coefs_heredity, 4)
+base::round(coefs_fe, 4)
+base::round(coefs_nofe, 4)
+base::round(coefs_heredity, 4)
