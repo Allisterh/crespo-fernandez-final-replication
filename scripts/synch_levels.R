@@ -63,80 +63,46 @@ coefs_fe = coefs_fe[!row.names(coefs_fe) %in% c(country_dummy_names, year_dummy_
 # Before moving into the Fixed Effects model, run the jointness analysis #
 # Compute jointness for all variables
 
-jointness.dw2 = jointness.score(model_fe, method = "DW2")
-jointness.ls2 = jointness.score(model_fe, method = "LS2")
-jointness.yqm = jointness.score(model_fe, method = "YQM")
-
-
-# Reorganize the columns of the matrix #
-
-col.order = base::rownames(stats::coef(model_fe, order.by.pip = F))
-
-jointness.dw2 = jointness.dw2[col.order,col.order]
-jointness.ls2 = jointness.ls2[col.order,col.order]
-jointness.yqm = jointness.yqm[col.order,col.order]
-
-
-
-
-
-# Melt the jointness measures to discover the maximum values #
-
-jointness.dw2 = reshape2::melt(jointness.dw2)
-jointness.ls2 = reshape2::melt(jointness.ls2)
-jointness.yqm = reshape2::melt(jointness.yqm)
-
-
-# Convert to numeric to turn NaN and . into NA values # 
-
-jointness.dw2 = jointness.dw2 %>% 
+jointness.dw2 = jointness.score(model_fe, method = "DW2") %>% 
+  reshape2::melt(.) %>% 
   dplyr::mutate(value = as.numeric(value))
 
-jointness.ls2 = jointness.ls2 %>% 
+jointness.ls2 = jointness.score(model_fe, method = "LS2") %>% 
+  reshape2::melt(.) %>% 
   dplyr::mutate(value = as.numeric(value))
 
-jointness.yqm = jointness.yqm %>% 
+jointness.yqm = jointness.score(model_fe, method = "YQM") %>% 
+  reshape2::melt(.) %>% 
   dplyr::mutate(value = as.numeric(value))
+
 
 # Get the maximum values in order to select the variables
 # that present the higher jointness
 
 max.jointness.dw2 = jointness.dw2 %>% 
-  dplyr::filter(value == base::max(value, na.rm = T))
+  dplyr::filter(value == base::max(value, na.rm = T)) %>% 
+  dplyr::mutate(pair = base::paste(pmin(as.character(Var1), as.character(Var2)), 
+                                   pmax(as.character(Var1), as.character(Var2)), sep = '-')) %>% 
+  dplyr::distinct(pair) %>% 
+  dplyr::filter(!grepl('year_',pair)) %>% 
+  dplyr::filter(!grepl('country_',pair))
 
 max.jointness.ls2 = jointness.ls2 %>% 
-  dplyr::filter(value == base::max(value, na.rm = T))
+  dplyr::filter(value == base::max(value, na.rm = T)) %>% 
+  dplyr::mutate(pair = base::paste(pmin(as.character(Var1), as.character(Var2)), 
+                                   pmax(as.character(Var1), as.character(Var2)), sep = '-')) %>% 
+  dplyr::distinct(pair) %>% 
+  dplyr::filter(!grepl('year_',pair)) %>% 
+  dplyr::filter(!grepl('country_',pair))
 
 max.jointness.yqm = jointness.yqm %>% 
-  dplyr::filter(value == base::max(value, na.rm = T))
-
-
-# In order to get unique values, consider creating a pair variable
-# and checking the unique values
-# Also, do not display the year nor country fixed effects variables
-
-max.jointness.dw2 = max.jointness.dw2 %>% 
+  dplyr::filter(value == base::max(value, na.rm = T)) %>% 
   dplyr::mutate(pair = base::paste(pmin(as.character(Var1), as.character(Var2)), 
-                      pmax(as.character(Var1), as.character(Var2)), sep = '-')) %>% 
+                                   pmax(as.character(Var1), as.character(Var2)), sep = '-')) %>% 
   dplyr::distinct(pair) %>% 
   dplyr::filter(!grepl('year_',pair)) %>% 
   dplyr::filter(!grepl('country_',pair))
 
-
-
-max.jointness.ls2 = max.jointness.ls2 %>% 
-  dplyr::mutate(pair = base::paste(pmin(as.character(Var1), as.character(Var2)), 
-                      pmax(as.character(Var1), as.character(Var2)), sep = '-')) %>% 
-  dplyr::distinct(pair) %>% 
-  dplyr::filter(!grepl('year_',pair)) %>% 
-  dplyr::filter(!grepl('country_',pair))
-
-max.jointness.yqm = max.jointness.yqm %>% 
-  dplyr::mutate(pair = base::paste(pmin(as.character(Var1), as.character(Var2)), 
-                      pmax(as.character(Var1), as.character(Var2)), sep = '-')) %>% 
-  dplyr::distinct(pair) %>% 
-  dplyr::filter(!grepl('year_',pair)) %>% 
-  dplyr::filter(!grepl('country_',pair))
 
 # Plot the matrices #
 # Recall: we do not show the year fixed effects #
