@@ -625,9 +625,9 @@ base::cat(dir.results(bma.synch.levels.forecast.data.nopiigs), "\n")
 
 # Print the forecast results without 2020 (part of Table A.5 in the paper)
 
-dplyr::cat(dir.results(without.2020(bma.synch.levels.forecast.data)), "\n")
-dplyr::cat(dir.results(without.2020(bma.synch.levels.forecast.data.piigs)), "\n")
-dplyr::cat(dir.results(without.2020(bma.synch.levels.forecast.data.nopiigs)), "\n")
+base::cat(dir.results(without.2020(bma.synch.levels.forecast.data)), "\n")
+base::cat(dir.results(without.2020(bma.synch.levels.forecast.data.piigs)), "\n")
+base::cat(dir.results(without.2020(bma.synch.levels.forecast.data.nopiigs)), "\n")
 
 # Arrange by country and date for consistency
 
