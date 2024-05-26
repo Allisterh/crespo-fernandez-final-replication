@@ -375,7 +375,7 @@ bma.model.synch.levels.1 = BMS::bms(synch_levels_data %>%
 
 bma.model.synch.levels.2 = BMS::bms(synch_levels_data %>%
                                  dplyr::mutate(date = zoo::as.Date(date)) %>%
-                                 dplyr::filter(date <= zoo:as.Date("2019-01-01")) %>%
+                                 dplyr::filter(date <= zoo::as.Date("2019-01-01")) %>%
                                  dplyr::select(-date, -country, -year_2020),
                                burn = n.burn.fcast, iter = n.iter.fcast, g = "BRIC", mprior = "random",
                                nmodel = 10000, mcmc = "bd", user.int = F, randomizeTimer = F,
